@@ -9,7 +9,14 @@ using namespace std;
 #define screenWidth 1200.00
 #define screenHeight 800.00
 #define black 0, 0, 0
-
+#define white 255, 255, 255
+#define blue 0, 0, 255
+#define red 255, 0,0
+#define dodger_blue 30,144,255
+#define violet 238,130,238
+#define antique_white 250,235,215
+#define indigo 75,0,130
+#define yellow 255,255,0
 /*
 	function iDraw() is called again and again by the system.
 
@@ -25,7 +32,7 @@ struct student
 
 vector<int> data;
 double Mess_x = 300, Mess_y = 100;
-int home_page = 0;
+int home_page = 1;
 int Create_page = 0, Join_page = 0;
 int wrMessname = 0, wrMessPass = 0;
 char Mess_Name[100], Mess_pass[100];
@@ -43,7 +50,7 @@ char meal_num[100] ="0" ,laundry_num[100] = "0",student_name[100]="Aritro";
 char meal_cost_str[100] = "0",laundry_cost_str[100] ="0",total_cost_str[100]="0";
 int draw_mem = 0,draw_man =0;
 //for student_info_page
-bool student_info_page = true;
+int student_info_page = 0;
 int students_num = 1;
 vector<student> students;
 char *info_page[5] ={"Name","Meal order",
@@ -60,42 +67,68 @@ void iDraw()
 {
 	// place your drawing codes here
 	iClear();
-	iSetColor(255, 255, 255);
+	iSetColor(antique_white);
 	iFilledRectangle(0, 0, 1920, 1080);
 	if (home_page)
 	{
 		iSetColor(black);
 		iRectangle(450, 600, 300, 100);
+		iSetColor(dodger_blue);
+		iFilledRectangle(450, 600, 300, 100);
+		iRectangle(455, 605, 290, 90);
+		iSetColor(blue);
+		iFilledRectangle(455, 605, 290, 90);
+		iSetColor(white);
 		iText(480,650, "MESS MANAGEMENT", GLUT_BITMAP_TIMES_ROMAN_24);
-		iRectangle(5100.00/11,300, 300, 500.00/11);
-		iText(480, 310, "Create Mess", GLUT_BITMAP_TIMES_ROMAN_24);
-		iRectangle(5100.00/11, 400, 300, 500.00/11);
-		iText(480,410, "Join Mess", GLUT_BITMAP_TIMES_ROMAN_24);
+		iSetColor(dodger_blue);
+		iFilledRectangle(458.63,295, 310, 55.45);
+		iSetColor(blue);
+		iFilledRectangle(5100.00/11,300, 300, 500.00/11);
+		iSetColor(white);
+		iText(550, 310, "Create Mess", GLUT_BITMAP_TIMES_ROMAN_24);
+		iSetColor(dodger_blue);
+		iFilledRectangle(458.63, 395, 310, 55.45);
+		iSetColor(blue);
+		iFilledRectangle(5100.00/11, 400, 300, 500.00/11);
+		iSetColor(white);
+		iText(550,410, "Join Mess", GLUT_BITMAP_TIMES_ROMAN_24);
 	}
 	else if (Create_page)
 	{
 
-		iSetColor(black);
-		iRectangle(450, 550, 450, 50); // upper big rectangle
+		iSetColor(indigo);
+		iFilledRectangle(450, 550, 150, 50); // upper small rectangle
+		iSetColor(yellow);
 		iText(450, 570, "Mess Name", GLUT_BITMAP_TIMES_ROMAN_24);
-		iRectangle(450, 550, 150, 50);	// upper small rectangle
-		iRectangle(450, 390, 450, 50); // lower big rectangle not whole
-		iRectangle(450, 390, 150, 50);	// lower big rectangle
+		iSetColor(indigo);
+		iRectangle(600, 550, 450, 50);// upper 2nd big rectangle
+		//iSetColor(black);
+		iText(605, 570, Mess_Name, GLUT_BITMAP_TIMES_ROMAN_24);
+		//iSetColor(indigo);
+		iFilledRectangle(450, 390, 150, 50);// lower big rectangle
+		iSetColor(yellow);
 		iText(450, 400, "Password", GLUT_BITMAP_TIMES_ROMAN_24);
-		iText(605, 570, Mess_Name, GLUT_BITMAP_TIMES_ROMAN_24);								 // Mess name box text
-		iRectangle(600, 300, 150, 50);			 // Enter button
-		iText(600, 320, "Enter", GLUT_BITMAP_TIMES_ROMAN_24);		 // Enter text
-		iText(605, 400, Mess_pass, GLUT_BITMAP_TIMES_ROMAN_24);						 // mess pass text box
-		iRectangle(250, 220, 75, 100/2.3);		 // Back Button box
+		iSetColor(indigo);
+		iText(605, 400, Mess_pass, GLUT_BITMAP_TIMES_ROMAN_24);
+		iRectangle(600, 390, 450, 50); // lower big rectangle not whole
+		
+		iFilledRectangle(600, 300, 150, 50);// Enter button
+		iSetColor(yellow);
+		iText(600, 320, "Enter", GLUT_BITMAP_TIMES_ROMAN_24);// Enter text
+		iSetColor(indigo);
+		iFilledRectangle(250, 220, 75, 100/2.3);// Back Button box
+		iSetColor(yellow);
 		iText(250, 230, "Back", GLUT_BITMAP_TIMES_ROMAN_24); // Back text box
 		if (wrMessname)
 		{
-			iRectangle(605,555,290,40);
+			iSetColor(indigo);
+			iRectangle(605,555,440,40);
 			//iText(wr_x, wr_y, Mess_Name, GLUT_BITMAP_TIMES_ROMAN_24);
 		}
 		if (wrMessPass)
 		{
-			iRectangle(605,395,290,40);
+			iSetColor(indigo);
+			iRectangle(605,395,440,40);
 			//iText(wr_xpass, wr_ypass, Mess_pass, GLUT_BITMAP_TIMES_ROMAN_24);
 		}
 	}
@@ -189,7 +222,7 @@ void iDraw()
 		iSetColor(black);
 		//For Student name
 		iRectangle(34,590,200,200.0/3);
-		iRectangle(39,MessPage_y-45,190,170.0/3);
+		iRectangle(39,595,190,170.0/3);
 		iText(44,600,"Name",GLUT_BITMAP_TIMES_ROMAN_24);
 		iText(244,600,student_name,GLUT_BITMAP_TIMES_ROMAN_24);
 		iRectangle(34,590,800,200.0/3);
@@ -199,10 +232,10 @@ void iDraw()
 		iText(849,605,"Change",GLUT_BITMAP_TIMES_ROMAN_24);
 
 		//For Meal order
-		iRectangle(MessPage_x+10,MessPage_y-50-screenHeight/12,screenWidth/6,screenHeight/12);
-		iRectangle(MessPage_x+15,MessPage_y-45-screenHeight/12,screenWidth/6-10,screenHeight/12-10);
-		iText(MessPage_x+20,MessPage_y-40-screenHeight/12,"Meal Order",GLUT_BITMAP_TIMES_ROMAN_24);
-		iRectangle(MessPage_x+10,MessPage_y-50-screenHeight/12,screenWidth/1.5,screenHeight/12);
+		iRectangle(34,MessPage_y-50-screenHeight/12,screenWidth/6,screenHeight/12);
+		iRectangle(39,MessPage_y-45-screenHeight/12,screenWidth/6-10,screenHeight/12-10);
+		iText(44,MessPage_y-40-screenHeight/12,"Meal Order",GLUT_BITMAP_TIMES_ROMAN_24);
+		iRectangle(34,MessPage_y-50-screenHeight/12,screenWidth/1.5,screenHeight/12);
 		iRectangle(MessPage_x+10+screenWidth/1.5,MessPage_y-50-screenHeight/12,screenWidth/6,screenHeight/12);
 		iRectangle(MessPage_x+10+screenWidth/6,MessPage_y-50-screenHeight/12,screenWidth/1.5,screenHeight/12);
 		iRectangle(MessPage_x+15+screenWidth/6,MessPage_y-45-screenHeight/12,screenWidth/1.5-screenWidth/6-10,screenHeight/12-10);
@@ -227,16 +260,16 @@ void iDraw()
 		iText(MessPage_x+25+screenWidth/1.5,MessPage_y-35-3*screenHeight/12,"Change",GLUT_BITMAP_TIMES_ROMAN_24);
 		//iRectangle(MessPage_x+15+screenWidth/1.5,MessPage_y-45-3*screenHeight/12,screenWidth/6-10,screenHeight/12-10); //Use it for Change box
 
-		iRectangle(400,screenHeight/2-200,400,100);
-		iRectangle(400,screenHeight/2-200,400,50);
-		iRectangle(400,screenHeight/2-150,150,50);
-		iRectangle(400,screenHeight/2-200,150,50);
-		iText(410,screenHeight/2-140,"Meal cost",GLUT_BITMAP_TIMES_ROMAN_24);
-		iText(560,screenHeight/2-140,meal_cost_str,GLUT_BITMAP_TIMES_ROMAN_24);
-		iText(410,screenHeight/2-190,"Laundry cost",GLUT_BITMAP_TIMES_ROMAN_24);
-		iText(560,screenHeight/2-190,laundry_cost_str,GLUT_BITMAP_TIMES_ROMAN_24);
-		iRectangle(800,screenHeight/2-200,200,100);
-		iText(820,screenHeight/2-150,total_cost_str,GLUT_BITMAP_TIMES_ROMAN_24);
+		iRectangle(400,200,400,100);
+		iRectangle(400,200,400,50);
+		iRectangle(400,250,150,50);
+		iRectangle(400,200,150,50);
+		iText(410,270,"Meal cost",GLUT_BITMAP_TIMES_ROMAN_24);
+		iText(560,270,meal_cost_str,GLUT_BITMAP_TIMES_ROMAN_24);
+		iText(410,210,"Laundry cost",GLUT_BITMAP_TIMES_ROMAN_24);
+		iText(560,210,laundry_cost_str,GLUT_BITMAP_TIMES_ROMAN_24);
+		iRectangle(800,200,200,100);
+		iText(820,250,total_cost_str,GLUT_BITMAP_TIMES_ROMAN_24);
 
 
 	}
@@ -322,19 +355,19 @@ void iMouse(int button, int state, int mx, int my)
 	//CREATE PAGE
 	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && Create_page)
 	{
-		if (mx <= (900) && mx >= 600 &&
+		if (mx >= (600) && mx <= 1050 &&
 			my >= (550) && my <= (600)) // writing mess name
 		{
 			wrMessname = 1;
 			wrMessPass = 0;
 		} 
-		if (mx >= 450 && mx <= 900 &&
+		else if (mx >= 600 && mx <= 1050 &&
 		 my >= 390 && my <= 440) // writing mess Password
 		{
 			wrMessPass = 1;
 			wrMessname = 0;
 		} 
-		if (mx >= (600) && mx <= 750 &&
+		else if (mx >= (600) && mx <= 750 &&
 		 my >= screenHeight / 2 - 100 && my <= screenHeight / 2 - 100 + Mess_y / 2) // For Enter button
 		{
 			Create_page = 0;
@@ -352,6 +385,11 @@ void iMouse(int button, int state, int mx, int my)
 			Mess_pass[Mess_pass_index] = '\0';
 			home_page =1;
 			Mess_page = 0;
+		}
+		else
+		{
+			wrMessname = 0;
+			wrMessPass = 0;
 		}
 	}
 	//JOIN PAGE
@@ -443,7 +481,8 @@ void iKeyboard(unsigned char key)
 
 		{
 			if (key != '\b')
-			{
+			{	
+				if(Mess_name_index>=27){Mess_name_index -=1;}
 				Mess_Name[Mess_name_index] = key;
 				Mess_name_index++;
 				Mess_Name[Mess_name_index] = '\0';
@@ -462,6 +501,7 @@ void iKeyboard(unsigned char key)
 		{
 			if (key != '\b')
 			{
+				if(Mess_pass_index>=27){Mess_pass_index -=1;}
 				Mess_pass[Mess_pass_index] = key;
 				Mess_pass_index++;
 				Mess_pass[Mess_pass_index] = '\0';
