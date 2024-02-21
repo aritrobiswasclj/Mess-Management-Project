@@ -22,7 +22,7 @@ using namespace std;
 
 */
 
-struct student
+typedef struct student
 {
 	char name[200],pass[200];
 	int meal ;//35 per meal
@@ -30,18 +30,20 @@ struct student
 	int total_cost = 35*meal+30*laundry;
 };
 
-vector<int> data;
-double Mess_x = 300, Mess_y = 100;
+
+//double Mess_x = 300, Mess_y = 100;
 int home_page = 1;
 int Create_page = 0, Join_page = 0;
-int wrMessname = 0, wrMessPass = 0;
+int wrMessname = 0, wrMessPass = 0,wrInvalid =0,wrInvalidUser = 0;
 char Mess_Name[100], Mess_pass[100];
 int Mess_name_index = 0, Mess_pass_index = 0;
-double wr_x = screenWidth / 2, wr_y = screenHeight / 2 + Mess_y * 1.7;
-double wr_xpass = screenWidth / 2, wr_ypass = screenHeight / 2;
+//for mess page
+char fname[200],freq[200] ;//mess file name
+//double wr_x = screenWidth / 2, wr_y = screenHeight / 2 + Mess_y * 1.7;
+//double wr_xpass = screenWidth / 2, wr_ypass = screenHeight / 2;
 int Mess_page = 0;
-double MessPage_x = screenWidth/50 ,MessPage_dy= screenHeight/10;
-double MessPage_y = screenHeight - 2*MessPage_dy;//640
+//double MessPage_x = screenWidth/50 ,MessPage_dy= screenHeight/10;
+//double MessPage_y = screenHeight - 2*MessPage_dy;//640
 double total_cost = 0,laudry_cost = 0,meal_cost =0;
 char tcoststr[100] = "123",lcoststr[100],tmcost[100];
 int Student_page = 0;
@@ -52,10 +54,10 @@ int draw_mem = 0,draw_man =0;
 //for student_info_page
 int student_info_page = 0;
 int students_num = 1;
-vector<student> students;
+student Students[500];
 char *info_page[5] ={"Name","Meal order",
 "Laundry order","Total cost","Password"};
-int wrName=0,wrPass = 0,wridx;
+int wrName = 0,wrPass = 0,wridx ;
 int Nameidx = 0,Passidx =0;
 char each_name[100],each_pass[100];
 
@@ -131,6 +133,20 @@ void iDraw()
 			iRectangle(605,395,440,40);
 			//iText(wr_xpass, wr_ypass, Mess_pass, GLUT_BITMAP_TIMES_ROMAN_24);
 		}
+		if(wrInvalid)
+		{
+			iSetColor(indigo);
+			iText(600,400,"INVALID PASSWORD",
+			GLUT_BITMAP_TIMES_ROMAN_24);
+			iText(600,560,"INVALID USERNAME",
+			GLUT_BITMAP_TIMES_ROMAN_24);
+		}
+		if(wrInvalidUser)
+		{
+			iSetColor(indigo);
+			iText(600,560,"USERNAME Already taken",
+			GLUT_BITMAP_TIMES_ROMAN_24);
+		}
 	}
 	else if (Join_page)
 	{
@@ -142,10 +158,10 @@ void iDraw()
 		//iRectangle(screenWidth / 2 - Mess_x / 2, screenHeight / 2 - Mess_y * .1, Mess_x / 2, Mess_y / 2);	// lower big rectangle
 		//iText(screenWidth / 2 - Mess_x / 2, screenHeight / 2, "Password", GLUT_BITMAP_TIMES_ROMAN_24);
 		iText(605, 570, Mess_Name, GLUT_BITMAP_TIMES_ROMAN_24);								 // Mess name box text
-		iRectangle(600, 300, Mess_x / 2, Mess_y / 2);			 // Join button
+		iRectangle(600, 300, 150, 50);			 // Join button
 		iText(600, 320, "Join", GLUT_BITMAP_TIMES_ROMAN_24);		 // Join text
-		iCircle(900, 400,13);//Member circle
-		iCircle(450, 400,13);//Manager circle
+		iCircle(900, 400,10);//Member circle
+		iCircle(450, 400,10);//Manager circle
 		iText(465, 390, "Manager", GLUT_BITMAP_TIMES_ROMAN_24);
 		iText(915, 390,"Member",GLUT_BITMAP_TIMES_ROMAN_24);
 		//iText(wr_xpass+5, wr_ypass, Mess_pass, GLUT_BITMAP_TIMES_ROMAN_24);						 // mess pass text box
@@ -158,30 +174,34 @@ void iDraw()
 		}
 		if(draw_mem )
 		{
-			iSetColor(black);
-			iFilledCircle(900, 400,10);//Member circle	
+			iSetColor(blue);
+			iFilledCircle(900, 400,7);//Member circle	
 		}
 		if(draw_man )
 		{
-			iSetColor(black);
-			iFilledCircle(450,400,10);//Manager circle
+			iSetColor(blue);
+			iFilledCircle(450,400,7);//Manager circle
 	
 		}
 		
 	}
 	else if(Mess_page)
 	{
-		iSetColor(black);
+		iSetColor(dodger_blue);
 		//For Mess name
-		iRectangle(300,730,400,40);
-		iRectangle(295,725,410,50);
+		iFilledRectangle(295,725,410,50);
+		iSetColor(blue);
+		iFilledRectangle(300,730,400,40);
 		//strcat(Mess_Name," Mess");
-		iText(310,740,Mess_Name,GLUT_BITMAP_TIMES_ROMAN_24);
+		iSetColor(white);
+		iText(330,740,Mess_Name,GLUT_BITMAP_TIMES_ROMAN_24);
 		//For Meal order box
+		iSetColor(indigo);
 		iRectangle(24,640,200,200.00/3);
+		//iSetColor(antique_white);
 		iRectangle(24,640,1000,200.00/3);
 		iRectangle(29,645,990,170.00/3);
-		iText(1087/3,650,"COST = ",GLUT_BITMAP_HELVETICA_18);
+		iText(1087/3+170,650,"COST = ",GLUT_BITMAP_HELVETICA_18);
 		iRectangle(24,640,500,200.00/3);
 		iRectangle(29,645,490,170.0/3);
 		iRectangle(29,645,190,170.0/3);
@@ -200,8 +220,8 @@ void iDraw()
 		iRectangle(29,1535.0/3,190,170.0/3);
 		iRectangle(24,1520.0/3,1000,200.0/3);
 		iRectangle(29,1535.0/3,990,170.0/3);
-		iText(229,MessPage_y-2*screenHeight/12+20,tcoststr,GLUT_BITMAP_HELVETICA_18);
-		iText(34,MessPage_y+35-2*screenHeight/12,"TOTAL COST",GLUT_BITMAP_HELVETICA_18);
+		iText(229,526.66,tcoststr,GLUT_BITMAP_HELVETICA_18);
+		iText(34,541.66,"TOTAL COST",GLUT_BITMAP_HELVETICA_18);
 		//For Total students
 		iRectangle(24,440,200,200.0/3);
 		iRectangle(29,445,190,170.0/3);
@@ -232,32 +252,32 @@ void iDraw()
 		iText(849,605,"Change",GLUT_BITMAP_TIMES_ROMAN_24);
 
 		//For Meal order
-		iRectangle(34,MessPage_y-50-screenHeight/12,screenWidth/6,screenHeight/12);
-		iRectangle(39,MessPage_y-45-screenHeight/12,screenWidth/6-10,screenHeight/12-10);
-		iText(44,MessPage_y-40-screenHeight/12,"Meal Order",GLUT_BITMAP_TIMES_ROMAN_24);
-		iRectangle(34,MessPage_y-50-screenHeight/12,screenWidth/1.5,screenHeight/12);
-		iRectangle(MessPage_x+10+screenWidth/1.5,MessPage_y-50-screenHeight/12,screenWidth/6,screenHeight/12);
-		iRectangle(MessPage_x+10+screenWidth/6,MessPage_y-50-screenHeight/12,screenWidth/1.5,screenHeight/12);
-		iRectangle(MessPage_x+15+screenWidth/6,MessPage_y-45-screenHeight/12,screenWidth/1.5-screenWidth/6-10,screenHeight/12-10);
-		iText(MessPage_x+20+screenWidth/6,MessPage_y-40-screenHeight/12,meal_num,GLUT_BITMAP_TIMES_ROMAN_24);
+		iRectangle(34,1570.0/3,200,800.0/12);
+		iRectangle(39,1585.0/3,190,170.0/3);
+		iText(44,1600.0/3,"Meal Order",GLUT_BITMAP_TIMES_ROMAN_24);
+		iRectangle(34,1570.0/3,800,200.0/3);
+		iRectangle(834,523.33,200,66.66);
+		iRectangle(234,523.33,800,66.66);
+		iRectangle(239,528.33,590,56.66);
+		iText(244,533.33,meal_num,GLUT_BITMAP_TIMES_ROMAN_24);
 		//For laundry order
-		iRectangle(MessPage_x+10,MessPage_y-50-2*screenHeight/12,screenWidth/6,screenHeight/12);
-		iRectangle(MessPage_x+15,MessPage_y-45-2*screenHeight/12,screenWidth/6-10,screenHeight/12-10);
-		iText(MessPage_x+20,MessPage_y-40-2*screenHeight/12,"Laundry Order",GLUT_BITMAP_TIMES_ROMAN_24);
-		iRectangle(MessPage_x+10,MessPage_y-50-2*screenHeight/12,screenWidth/1.5,screenHeight/12);
-		iRectangle(MessPage_x+10+screenWidth/1.5,MessPage_y-50-2*screenHeight/12,screenWidth/6,screenHeight/12);
-		iRectangle(MessPage_x+10+screenWidth/6,MessPage_y-50-2*screenHeight/12,screenWidth/1.5,screenHeight/12);
-		iRectangle(MessPage_x+15+screenWidth/6,MessPage_y-45-2*screenHeight/12,screenWidth/1.5-screenWidth/6-10,screenHeight/12-10);
-		iText(MessPage_x+20+screenWidth/6,MessPage_y-40-2*screenHeight/12,laundry_num,GLUT_BITMAP_TIMES_ROMAN_24);
+		iRectangle(34,456.66,200,66.66);
+		iRectangle(39,461.66,190,56.66);
+		iText(44,466.67,"Laundry Order",GLUT_BITMAP_TIMES_ROMAN_24);
+		iRectangle(34,456.66,800,66.66);
+		iRectangle(834,456.66,200,66.66);
+		iRectangle(234,456.66,800,66.66);
+		iRectangle(239,461.66,590,56.66);
+		iText(244,466.66,laundry_num,GLUT_BITMAP_TIMES_ROMAN_24);
 		//For Password 
-		iRectangle(MessPage_x+10,MessPage_y-50-3*screenHeight/12,screenWidth/6,screenHeight/12);
-		iRectangle(MessPage_x+15,MessPage_y-45-3*screenHeight/12,screenWidth/6-10,screenHeight/12-10);
-		iText(MessPage_x+20,MessPage_y-40-3*screenHeight/12,"Password",GLUT_BITMAP_TIMES_ROMAN_24);
-		iRectangle(MessPage_x+10,MessPage_y-50-3*screenHeight/12,screenWidth/1.5,screenHeight/12);
-		iRectangle(MessPage_x+10+screenWidth/1.5,MessPage_y-50-3*screenHeight/12,screenWidth/6,screenHeight/12);
-		iRectangle(MessPage_x+10+screenWidth/6,MessPage_y-50-3*screenHeight/12,screenWidth/1.5,screenHeight/12);
-		iRectangle(MessPage_x+15+screenWidth/6,MessPage_y-45-3*screenHeight/12,screenWidth/1.5-screenWidth/6-10,screenHeight/12-10);
-		iText(MessPage_x+25+screenWidth/1.5,MessPage_y-35-3*screenHeight/12,"Change",GLUT_BITMAP_TIMES_ROMAN_24);
+		iRectangle(34,390,200,66.66);
+		iRectangle(39,395,190,56.66);
+		iText(44,400,"Password",GLUT_BITMAP_TIMES_ROMAN_24);
+		iRectangle(34,390,800,66.66);
+		iRectangle(834,390,200,66.66);
+		iRectangle(234,390,800,66.66);
+		iRectangle(239,395,590,56.66);
+		iText(849,405,"Change",GLUT_BITMAP_TIMES_ROMAN_24);
 		//iRectangle(MessPage_x+15+screenWidth/1.5,MessPage_y-45-3*screenHeight/12,screenWidth/6-10,screenHeight/12-10); //Use it for Change box
 
 		iRectangle(400,200,400,100);
@@ -290,15 +310,15 @@ void iDraw()
 			{
 				if(j==0)
 				{
-				//iText(150+j*200,700-60*i,
-				//students[i].name,
-				//GLUT_BITMAP_TIMES_ROMAN_24);
+				iText(150+j*200,700-60*i,
+				Students[i].name,
+				GLUT_BITMAP_TIMES_ROMAN_24);
 				}
 				else if(j==4)
 				{
-				//iText(150+j*200,700-60*i,
-				//students[i].pass,
-				//GLUT_BITMAP_TIMES_ROMAN_24);
+				iText(150+j*200,700-60*i,
+				Students[i].pass,
+				GLUT_BITMAP_TIMES_ROMAN_24);
 				}
 				iRectangle(150+j*200,700-60*i,200,60);
 			}
@@ -360,25 +380,64 @@ void iMouse(int button, int state, int mx, int my)
 		{
 			wrMessname = 1;
 			wrMessPass = 0;
+			wrInvalid = 0;
+			wrInvalidUser = 0;
 		} 
 		else if (mx >= 600 && mx <= 1050 &&
 		 my >= 390 && my <= 440) // writing mess Password
 		{
 			wrMessPass = 1;
 			wrMessname = 0;
+			wrInvalid = 0;
+			wrInvalidUser = 0;
 		} 
 		else if (mx >= (600) && mx <= 750 &&
-		 my >= screenHeight / 2 - 100 && my <= screenHeight / 2 - 100 + Mess_y / 2) // For Enter button
+		 my >= 300 && my <= 350) // For Enter button
 		{
-			Create_page = 0;
 			wrMessname = 0;
 			wrMessname = 0;
-			Mess_page = 1;
+			if(Mess_name_index>=1 && Mess_pass_index>=1)
+			{
+				
+				strcat(fname,Mess_Name);
+				strcat(fname,".txt");
+				FILE *fptr = fopen(fname,"r");
+				if(fptr == NULL)//no existing mess
+				{
+					Mess_page = 1;
+					Create_page = 0;
+					fptr = fopen(fname,"w");
+					strcat(freq,Mess_Name);
+					strcat(freq,"req");
+					strcat(freq,".txt");
+					fptr = fopen(fname,"w");
+				}
+				else//exits mess of the name
+				{
+				wrInvalidUser = 1;
+				wrMessname =0,wrMessPass=0;
+				Mess_name_index = 0;
+				Mess_pass_index = 0;
+				Mess_Name[Mess_name_index] = '\0';
+				Mess_pass[Mess_pass_index] = '\0';
+				fname[Mess_name_index] = '\0';
+				}
+			}
+			else
+			{
+				wrInvalid = 1;
+				wrMessname =0,wrMessPass=0;
+				Mess_name_index = 0;
+				Mess_pass_index = 0;
+				Mess_Name[Mess_name_index] = '\0';
+				Mess_pass[Mess_pass_index] = '\0';
+			}
 		}
-		else if (mx >= (screenWidth / 4) - 50 && mx <= (screenWidth / 4) - 50 + Mess_x / 4 
-		&& my >= screenHeight / 2 - 180 && my <= screenHeight / 2 - 180 + Mess_y / 2) // for back button
+		else if (mx >= 250 && mx <= 325 
+		&& my >= 220 && my <= 270) // for back button
 		{
 			Create_page = 0, wrMessname = 0, wrMessname = 0;
+			wrInvalid =0,wrInvalidUser = 0 ;
 			Mess_name_index = 0;
 			Mess_pass_index = 0;
 			Mess_Name[Mess_name_index] = '\0';
@@ -390,6 +449,8 @@ void iMouse(int button, int state, int mx, int my)
 		{
 			wrMessname = 0;
 			wrMessPass = 0;
+			wrInvalid  =0;
+			wrInvalidUser = 0;
 		}
 	}
 	//JOIN PAGE
@@ -409,6 +470,7 @@ void iMouse(int button, int state, int mx, int my)
 			draw_mem = 1;
 			//cout<<"ok"<<endl;
 			draw_man =0;
+			wrMessname = 0;
 		}
 		else if((mx-450)
 		*(mx-450)
@@ -417,6 +479,7 @@ void iMouse(int button, int state, int mx, int my)
 			//cout<<"OK"<<endl;
 			draw_man =1;
 			draw_mem =0;
+			wrMessname = 0;
 		}
 		else if (mx >= 600 && mx <= 750 &&
 		 my >= 300 && my <= 350) // For Enter button
@@ -426,16 +489,30 @@ void iMouse(int button, int state, int mx, int my)
 			wrMessname = 0;
 			Student_page = 1;
 		}
-		else if (mx >= (screenWidth / 4) - 50 && mx <= (screenWidth / 4) - 50 + Mess_x / 4 && 
-		my >= screenHeight / 2 - 180 && my <= screenHeight / 2 - 180 + Mess_y / 2) // for back button
+		else if (mx >= 250 && mx <= 325 && 
+		my >=  220 && my <= 270) // for back button
 		{
 			Join_page = 0, wrMessname = 0, wrMessname = 0;
 			Mess_name_index = 0;
 			Mess_pass_index = 0;
 			Mess_Name[Mess_name_index] = '\0';
 			Mess_pass[Mess_pass_index] = '\0';
-
+			draw_man=0,draw_mem =0;
 			home_page = 1;
+		}
+		else
+		{
+			wrMessname = 0, draw_mem =0;
+			draw_man =0;
+		}
+	}
+	//Mess_page
+	else if(button == GLUT_LEFT_BUTTON && state == GLUT_UP && Mess_page)
+	{
+		if(mx>=24 && mx<=224 && my>=1120.0/3&&my<=440)
+		{
+			Mess_page = 0;
+			student_info_page = 1;
 		}
 	}
 	//Student_info_page;
@@ -447,7 +524,7 @@ void iMouse(int button, int state, int mx, int my)
 		{
 			
 			students_num+=1;
-			//students.push_back(s1);
+			//Students[students_num-1] ={"Aritro","123",0,0,0};
 		}
 		for(int i=1;i<students_num;i++)
 		{
