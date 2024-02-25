@@ -3,6 +3,7 @@
 #include<bits/stdc++.h>
 #include <windows.h>
 #include <mmsystem.h>
+#include<stdlib.h>
 using namespace std;
 #pragma comment(lib, "Winmm.lib")
 
@@ -27,23 +28,46 @@ typedef struct student
 	char name[200],pass[200];
 	int meal ;//35 per meal
 	int laundry ;//30 per dress
-	int total_cost = 35*meal+30*laundry;
+	int total = 35*meal+30*laundry;
 };
+
+
+
+
 
 
 //double Mess_x = 300, Mess_y = 100;
 int home_page = 1;
 int Create_page = 0, Join_page = 0;
-int wrMessname = 0, wrMessPass = 0,wrInvalid =0,wrInvalidUser = 0;
+int wrMessname = 0, wrMessPass = 0,wrInvalid =0;
+int wrInvalidUser = 0;
+
 char Mess_Name[100], Mess_pass[100];
 int Mess_name_index = 0, Mess_pass_index = 0;
+int invalid_option = 0;
 //for mess page
 char fname[200],freq[200] ;//mess file name
+FILE * fptr;FILE *fptr2;//for opening  and reading mess file
 //double wr_x = screenWidth / 2, wr_y = screenHeight / 2 + Mess_y * 1.7;
 //double wr_xpass = screenWidth / 2, wr_ypass = screenHeight / 2;
 int Mess_page = 0;
 //double MessPage_x = screenWidth/50 ,MessPage_dy= screenHeight/10;
 //double MessPage_y = screenHeight - 2*MessPage_dy;//640
+
+//Login or request page
+int req_log_page = 0,sname_index = 0 ,spass_index = 0;
+student s1 ={"","",0,0,0};
+int write_sname = 0,write_spass = 0,check = 0;
+int req =0,wrong_pass =0;
+char check_name[100],check_pass[100],manager_pass[100];
+char req_content[100];
+student requests[500];int reqidx =0,req_page = 0;
+char num[100];//for index meal,laundry total cost;
+int selectidx = -1;
+//for scrolling 
+double starty = 0,dy =0,endy =0;
+
+
 double total_cost = 0,laudry_cost = 0,meal_cost =0;
 char tcoststr[100] = "123",lcoststr[100],tmcost[100];
 int Student_page = 0;
@@ -62,6 +86,53 @@ int Nameidx = 0,Passidx =0;
 char each_name[100],each_pass[100];
 
 
+void delete_line(int index,char *filename)
+{
+    char tempfile[100]="temp__",buffer[100];
+    strcat(tempfile,filename);
+    FILE *fptr1=fopen(filename,"r");
+    FILE *temp1 = fopen(tempfile,"w");
+    int i = 0;
+    while(fgets(buffer,100,fptr))
+    {
+        if(i!=index)
+        {
+            fputs(buffer,temp1);
+			//sscanf(buffer,"%s %[^\n]s",requests[j].pass
+			//,requests[j].pass);
+			//j+=1;
+        }
+		//else{j+=1;}
+        i+=1;
+    }
+	//reqidx = j;
+    fclose(fptr1);
+    fclose(temp1);
+    remove(filename);
+    rename(tempfile,filename);
+}
+void set_requests()
+{
+	FILE *fptr3;
+	strcpy(freq,Mess_Name);
+	strcat(freq,"_req.txt");
+	delete_line(selectidx,freq);
+	//set_requests();
+	reqidx =0;
+	fptr3 = fopen(freq,"r");
+	while(fgets(req_content,100,fptr3))
+	{	
+		sscanf(req_content,"%s %[^\n]s",
+		requests[reqidx].pass
+		,requests[reqidx].name);
+		requests[reqidx].meal = 0;
+		requests[reqidx].laundry = 0;
+		requests[reqidx].total = 0;
+		//printf("%s\n",requets[reqidx].name);
+		reqidx++;
+	}
+	fclose(fptr3);
+}
 
 //int Join_page = 0;
 
@@ -183,6 +254,17 @@ void iDraw()
 			iFilledCircle(450,400,7);//Manager circle
 	
 		}
+		if(invalid_option)
+		{
+			iSetColor(indigo);
+			iText(600,400,"Choose an option", 
+			GLUT_BITMAP_TIMES_ROMAN_24);
+		}
+		if(wrInvalidUser)
+		{
+			iText(605, 570, "Invalid Messname", 
+			GLUT_BITMAP_TIMES_ROMAN_24);
+		}
 		
 	}
 	else if(Mess_page)
@@ -197,7 +279,7 @@ void iDraw()
 		iText(330,740,Mess_Name,GLUT_BITMAP_TIMES_ROMAN_24);
 		//For Meal order box
 		iSetColor(indigo);
-		iRectangle(24,640,200,200.00/3);
+		//iRectangle(24,640,200,200.00/3);
 		//iSetColor(antique_white);
 		iRectangle(24,640,1000,200.00/3);
 		iRectangle(29,645,990,170.00/3);
@@ -233,7 +315,11 @@ void iDraw()
 		iRectangle(24,1120.0/3,200,200.0/3);
 		iRectangle(29,1135.0/3,190,170.0/3);
 		iText(34,1225.0/3,"STUDENTS INFO",GLUT_BITMAP_HELVETICA_18);
-		
+		//For requests
+		iRectangle(25,300,200,70);
+		iText(35,310,"Requests",
+		GLUT_BITMAP_TIMES_ROMAN_24);
+		iRectangle(30,305,190,60);
 		//MessPage_y -= MessPage_dy;
 	
 	}
@@ -289,7 +375,9 @@ void iDraw()
 		iText(410,210,"Laundry cost",GLUT_BITMAP_TIMES_ROMAN_24);
 		iText(560,210,laundry_cost_str,GLUT_BITMAP_TIMES_ROMAN_24);
 		iRectangle(800,200,200,100);
-		iText(820,250,total_cost_str,GLUT_BITMAP_TIMES_ROMAN_24);
+		iText(820,250,total_cost_str,
+		GLUT_BITMAP_TIMES_ROMAN_24);
+		
 
 
 	}
@@ -336,6 +424,162 @@ void iDraw()
 			iRectangle(955,705-60*wridx,190,50);
 		}
 	}
+	else if(req_log_page)
+	{
+		if(draw_man)
+		{
+			iSetColor(dodger_blue);
+			iFilledRectangle(300,500,210,50);
+			iSetColor(blue);
+			iFilledRectangle(305,505,200,40);
+			iSetColor(white);
+			iText(310,510,"Manager Password",
+			GLUT_BITMAP_TIMES_ROMAN_24);
+			iSetColor(blue);
+			iRectangle(510,500,300,50);//password
+			iText(520,510,manager_pass,
+			GLUT_BITMAP_TIMES_ROMAN_24);
+			iSetColor(dodger_blue);//back option
+			iFilledRectangle(300,300,100,50);
+			iSetColor(blue);
+			iFilledRectangle(305,305,90,40);
+			iSetColor(white);
+			iText(310,310,"Back",GLUT_BITMAP_TIMES_ROMAN_24);
+			iSetColor(dodger_blue);//login option
+			iFilledRectangle(500,300,100,50);
+			iSetColor(blue);
+			iFilledRectangle(505,305,90,40);
+			iSetColor(white);
+			iText(510,310,"Login",GLUT_BITMAP_TIMES_ROMAN_24);
+			if(write_spass)
+			{
+				iSetColor(indigo);
+				iRectangle(515,505,290,40);
+				iText(520,510,manager_pass,
+				GLUT_BITMAP_TIMES_ROMAN_24);
+			}
+			if(wrong_pass)
+			{
+				iSetColor(indigo);
+				//iRectangle(515,505,290,40);
+				iText(520,510,"Wrong Password",
+				GLUT_BITMAP_TIMES_ROMAN_24);
+			}
+
+		}
+		else if(draw_mem)
+		{
+			iSetColor(dodger_blue);
+			iFilledRectangle(300,500,210,50);
+			iSetColor(blue);
+			iFilledRectangle(305,505,200,40);
+			iSetColor(white);
+			iText(310,510,"Member Name",
+			GLUT_BITMAP_TIMES_ROMAN_24);
+			iSetColor(dodger_blue);
+			iFilledRectangle(300,400,210,50);
+			iSetColor(blue);
+			iFilledRectangle(305,405,200,40);
+			iSetColor(white);
+			iText(310,410,"Member Password",
+			GLUT_BITMAP_TIMES_ROMAN_24);
+			iSetColor(blue);
+			iRectangle(510,400,300,50);//password
+			iText(520,410,s1.pass,
+			GLUT_BITMAP_TIMES_ROMAN_24);
+			iRectangle(510,500,300,50);//name
+			iText(520,510,s1.name,
+			GLUT_BITMAP_TIMES_ROMAN_24);
+			iSetColor(dodger_blue);//back option
+			iFilledRectangle(300,300,100,50);
+			iSetColor(blue);
+			iFilledRectangle(305,305,90,40);
+			iSetColor(white);
+			iText(310,310,"Back",GLUT_BITMAP_TIMES_ROMAN_24);
+
+			iSetColor(dodger_blue);//login option
+			iFilledRectangle(500,300,100,50);
+			iSetColor(blue);
+			iFilledRectangle(505,305,90,40);
+			iSetColor(white);
+			iText(510,310,"Login",GLUT_BITMAP_TIMES_ROMAN_24);
+
+			iSetColor(dodger_blue);//request to login option
+			iFilledRectangle(700,300,100,50);
+			iSetColor(blue);
+			iFilledRectangle(705,305,90,40);
+			iSetColor(white);
+			iText(710,310,"Request",
+			GLUT_BITMAP_TIMES_ROMAN_24);
+			if(write_sname)
+			{
+				iSetColor(indigo);
+				iRectangle(515,505,290,40);//name
+				iText(520,510,s1.name,
+				GLUT_BITMAP_TIMES_ROMAN_24);
+			}
+			else if(write_spass)
+			{
+				iSetColor(indigo);
+				iRectangle(515,405,290,40);//password
+				iText(520,410,s1.pass,
+				GLUT_BITMAP_TIMES_ROMAN_24);
+			}
+			if(req)
+			{
+				iSetColor(indigo);
+				iFilledRectangle(500,200,300,50);
+				iSetColor(yellow);
+				iText(510,210,"Request has been added",
+				GLUT_BITMAP_TIMES_ROMAN_24);
+			}
+			if(check)
+			{
+				iSetColor(indigo);
+				iFilledRectangle(500,200,400,50);
+				iSetColor(yellow);
+				iText(510,210,"Request has already been added",
+				GLUT_BITMAP_TIMES_ROMAN_24);
+			}
+		}
+	}
+	if(req_page)
+	{
+		iSetColor(indigo);
+		for(int i=0;i<reqidx;i++)
+		{
+			iSetColor(indigo);
+			iRectangle(30,700-i*40+dy,100,40);//for index box
+			iSetColor(black);
+			sprintf(num,"%d",i+1);
+			iText(40,710-40*i+dy,num,
+			GLUT_BITMAP_TIMES_ROMAN_24);//index text
+			iSetColor(indigo);
+			iRectangle(130,700-i*40+dy,350,40);
+			iText(140,710-i*40+dy,requests[i].name,
+			GLUT_BITMAP_TIMES_ROMAN_24);//name
+		}
+		//Add option
+		iFilledRectangle(700,700,100,40);
+		iSetColor(yellow);
+		iText(710,710,"Add",GLUT_BITMAP_TIMES_ROMAN_24);
+		//for remove option
+		iSetColor(indigo);
+		iFilledRectangle(900,700,100,40);
+		iSetColor(yellow);
+		iText(910,710,"Remove",GLUT_BITMAP_TIMES_ROMAN_24);
+		//back option
+		iSetColor(indigo);
+		iFilledRectangle(700,600,100,40);
+		iSetColor(yellow);
+		iText(710,610,"Back",GLUT_BITMAP_TIMES_ROMAN_24);
+		if(selectidx != -1)
+		{
+			iSetColor(indigo);
+			iRectangle(35,705-selectidx*40+dy,90,30);
+		}
+	}
+
 	
 }
 
@@ -345,7 +589,10 @@ void iDraw()
 	*/
 void iMouseMove(int mx, int my)
 {
-
+	if(req_page)
+	{
+		
+	}
 	// place your codes here
 }
 
@@ -399,18 +646,21 @@ void iMouse(int button, int state, int mx, int my)
 			if(Mess_name_index>=1 && Mess_pass_index>=1)
 			{
 				
-				strcat(fname,Mess_Name);
+				strcpy(fname,Mess_Name);
 				strcat(fname,".txt");
-				FILE *fptr = fopen(fname,"r");
+				fptr = fopen(fname,"r");
 				if(fptr == NULL)//no existing mess
 				{
 					Mess_page = 1;
 					Create_page = 0;
 					fptr = fopen(fname,"w");
+					fprintf(fptr,"%s:%s\n",
+					"Manager_pass",Mess_pass);
 					strcat(freq,Mess_Name);
-					strcat(freq,"req");
+					strcat(freq,"_req");
 					strcat(freq,".txt");
-					fptr = fopen(fname,"w");
+					fptr = fopen(freq,"w");
+					fclose(fptr);
 				}
 				else//exits mess of the name
 				{
@@ -460,6 +710,7 @@ void iMouse(int button, int state, int mx, int my)
 			my >= (550) && my <= (600)) // writing mess name
 		{
 			wrMessname = 1;
+			wrInvalidUser = 0;
 			//wrMessPass = 0;
 		}
 		
@@ -468,7 +719,8 @@ void iMouse(int button, int state, int mx, int my)
 		+ (my-400)*(my-400)<= 169)
 		{
 			draw_mem = 1;
-			//cout<<"ok"<<endl;
+			invalid_option =0;
+			wrInvalidUser = 0;
 			draw_man =0;
 			wrMessname = 0;
 		}
@@ -478,16 +730,36 @@ void iMouse(int button, int state, int mx, int my)
 		{
 			//cout<<"OK"<<endl;
 			draw_man =1;
-			draw_mem =0;
-			wrMessname = 0;
+			draw_mem =0;wrInvalidUser = 0;
+			wrMessname = 0;invalid_option=0;
 		}
 		else if (mx >= 600 && mx <= 750 &&
 		 my >= 300 && my <= 350) // For Enter button
 		{
-			Join_page = 0;
+			//Join_page = 0;
 			wrMessname = 0;
 			wrMessname = 0;
-			Student_page = 1;
+			strcpy(fname,Mess_Name);
+			strcat(fname,".txt");
+			fptr = fopen(fname, "r");
+			if((draw_man==1 || draw_mem==1)&& 
+			Mess_name_index>=1 && fptr!=NULL)
+			{	req_log_page = 1;
+				Join_page=0;
+				wrMessname = 0;
+			}
+			else if(Mess_name_index ==0 || fptr == NULL)
+			{
+				wrInvalidUser =1;
+				Mess_name_index = 0;
+				//Mess_pass_index = 0;
+				Mess_Name[Mess_name_index] = '\0';
+				//wrMessname = 0;
+			}
+			else
+			{
+				invalid_option = 1;
+			}
 		}
 		else if (mx >= 250 && mx <= 325 && 
 		my >=  220 && my <= 270) // for back button
@@ -498,12 +770,15 @@ void iMouse(int button, int state, int mx, int my)
 			Mess_Name[Mess_name_index] = '\0';
 			Mess_pass[Mess_pass_index] = '\0';
 			draw_man=0,draw_mem =0;
+			invalid_option = 0;
 			home_page = 1;
+			wrInvalidUser = 0;
 		}
 		else
 		{
 			wrMessname = 0, draw_mem =0;
 			draw_man =0;
+			wrInvalidUser = 0;
 		}
 	}
 	//Mess_page
@@ -514,6 +789,80 @@ void iMouse(int button, int state, int mx, int my)
 			Mess_page = 0;
 			student_info_page = 1;
 		}
+		if(mx>=25 && mx<=225 && my>=300 && my<=370)
+		{
+			strcpy(freq,Mess_Name);
+			strcat(freq,"_req.txt");
+			fptr2 = fopen(freq,"r");
+			while(fgets(req_content,100,fptr2))
+			{
+				sscanf(req_content,"%s %[^\n]s",
+				requests[reqidx].pass
+				,requests[reqidx].name);
+				requests[reqidx].meal = 0;
+				requests[reqidx].laundry = 0;
+				requests[reqidx].total = 0;
+				//printf("%s\n",requets[reqidx].name);
+				reqidx++;
+			}
+			fclose(fptr2);
+			req_page = 1;
+			Mess_page = 0;
+		}
+	}
+	else if( req_page)
+	{
+		if(mx>=700 && mx<=800 && my>=600 && my<=640 &&
+		button == GLUT_LEFT_BUTTON && 
+		state == GLUT_UP)//back
+		{
+			Mess_page =1;req_page = 0;
+			reqidx = 0;
+			selectidx = -1;
+		}
+		if(mx>=700 &&mx<=800 && my>=700 && my<=740
+		&& button == GLUT_LEFT_BUTTON && 
+		state == GLUT_UP)//add
+		{	
+			if(selectidx != -1)
+			{
+			
+			strcpy(fname,Mess_Name);
+			strcpy(freq,Mess_Name);
+			strcat(fname,".txt");
+			strcat(freq,"_req.txt");
+			fptr = fopen(fname,"a");
+			fprintf(fptr,"%s %d %d %d %s\n",
+			requests[selectidx].pass,requests[selectidx].meal,
+			requests[selectidx].laundry,requests[selectidx].total,
+			requests[selectidx].name);
+			fclose(fptr);
+			//delete_line(selectidx,freq);
+			set_requests();
+			
+
+			selectidx =-1;
+			}
+		}
+		if(mx>=900 &&mx<=1000 && my>=700 && my<=740
+		&& button == GLUT_LEFT_BUTTON && 
+		state == GLUT_UP)//remove
+		{
+			if(selectidx!=-1)
+			{
+				set_requests();
+				selectidx =-1;
+			}
+		}
+		else{
+			for(int i=0;i<reqidx;i++)
+			{
+				if(mx>=30 && mx<=480
+				&& my>=700-i*40+dy &&my<= 740-i*40+dy)
+				{selectidx = i;break;}
+			}
+		}
+		
 	}
 	//Student_info_page;
 	else if(button == GLUT_LEFT_BUTTON && 
@@ -541,6 +890,120 @@ void iMouse(int button, int state, int mx, int my)
 				wridx = i;
 				wrName =0;
 				wrPass = 1;
+			}
+		}
+	}
+	//req_log_page();
+	else if(button == GLUT_LEFT_BUTTON &&
+	 state == GLUT_UP && req_log_page)
+	{
+		if(draw_mem)
+		{
+			if(mx>=300&& mx<=400
+			&& my>=300 && my<=350)//back
+			{
+				draw_mem = 0;
+				draw_man =0;
+				req_log_page = 0;
+				Join_page = 1;
+				sname_index = 0;
+				spass_index = 0;
+				s1.name[sname_index] = 0;
+				s1.pass[spass_index] = 0;
+				Mess_name_index = 0;
+				Mess_Name[Mess_name_index]= '\0';
+				req =0,check = 0;
+			}
+			else if(mx>=510 && mx<=810 &&
+			my>= 500 && my<=550)
+			{
+				write_sname =1;
+				write_spass =0;
+				req = 0,check = 0;
+			}
+			else if(mx>=510&& mx<=810
+			&& my>=400 && my<=450)
+			{
+				write_sname =0;
+				write_spass= 1;
+				req  =0,check = 0;
+			}
+			else if(mx>=700 && mx<=800
+			&& my>=300 && my<=350)//request 
+			{
+				write_sname =0;
+				write_spass = 0;
+				strcpy(freq,Mess_Name);
+				strcat(freq,"_req.txt");
+				fptr2 = fopen(freq,"r");
+				while(fgets(req_content,100,fptr2))
+				{
+					sscanf(req_content,
+					"%s %[^\n]s",
+					check_pass,check_name);
+					printf("%s: %s\n",check_name,check_pass);
+					if(strcmp(check_name,s1.name)==0
+					&& strcmp(check_pass,s1.pass)==0)
+					{check = 1;fclose(fptr2);
+					break;}
+				}
+				fclose(fptr2);
+				//if(check==0){
+				//fptr = fopen(freq,"w");
+				if(sname_index>0 && 
+				spass_index>0 && check!=1)
+				{
+				fptr = fopen(freq,"a");
+				fprintf(fptr,"%s %s\n",
+				s1.pass,s1.name);
+				fclose(fptr);
+				req = 1;
+				}
+				sname_index =0;
+				spass_index=0;
+				s1.name[sname_index] = '\0';
+				s1.pass[spass_index] = '\0';
+			}
+		}
+		if(draw_man)
+		{
+			if(mx>=510 && mx<=810
+			&& my>= 500 && my<=550)
+			{
+				write_spass =1;
+				wrong_pass = 0 ;
+			}
+			if(mx>500 && mx<=600
+			&& my>=300 && my<=350)//login
+			{
+				write_spass =0;
+				strcpy(fname,Mess_Name);
+				strcat(fname,".txt");
+				fptr = fopen(fname,"r");
+				fscanf(fptr,"Manager_pass:%s",check_pass);
+				fclose(fptr);
+				if(strcmp(manager_pass,check_pass)==0)
+				{
+					req_log_page=0;
+					Mess_page = 1;
+				}
+				else
+				{
+					spass_index = 0;
+					manager_pass[spass_index]='\0';
+					wrong_pass = 1;
+					
+				}
+			}
+			if(mx>=300 && mx<=400
+			&& my>=300 && my<=350)
+			{
+				spass_index =0;
+				check_pass[spass_index]='\0';
+				manager_pass[spass_index]= '\0';
+				req_log_page =0;
+				Join_page =1;
+				draw_man =0;
 			}
 		}
 	}
@@ -668,6 +1131,54 @@ void iKeyboard(unsigned char key)
 				each_pass[Passidx] ='\0';
 			}
 			
+		}
+	}
+	else if(req_log_page)
+	{
+		if(draw_mem && write_sname)
+		{
+			if(key!='\b')
+			{
+				s1.name[sname_index] = key;
+				sname_index++;
+				s1.name[sname_index] = '\0';
+			}
+			else
+			{
+				sname_index--;
+				if(sname_index<=0){sname_index =0;}
+				s1.name[sname_index] ='\0';
+			}
+		}
+		else if(draw_mem && write_spass)
+		{
+			if(key!='\b' && key!= ' ')
+			{
+				s1.pass[spass_index] = key;
+				spass_index++;
+				s1.pass[spass_index] = '\0';
+			}
+			else if(key == '\b')
+			{
+				spass_index--;
+				if(spass_index<=0){spass_index =0;}
+				s1.pass[spass_index] ='\0';
+			}
+		}
+		else if(draw_man && write_spass)
+		{
+			if(key!='\b' && key!= ' ')
+			{
+				manager_pass[spass_index] = key;
+				spass_index++;
+				manager_pass[spass_index] = '\0';
+			}
+			else if(key == '\b')
+			{
+				spass_index--;
+				if(spass_index<=0){spass_index =0;}
+				manager_pass[spass_index] ='\0';
+			}
 		}
 	}
 	// place your codes for other keys here
