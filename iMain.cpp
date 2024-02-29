@@ -63,6 +63,8 @@ char check_name[100],check_pass[100],manager_pass[100];
 char req_content[100],buffer[100];
 student requests[500];int reqidx =0;
 student st;
+
+//requests page
 int req_page = 0;
 char num[100];//for index meal,laundry total cost;
 int selectidx = -1;//for req page
@@ -96,6 +98,52 @@ int wrName = 0,wrPass = 0,wridx ;
 int Nameidx = 0,Passidx =0;
 char each_name[100],each_pass[100];
 
+
+void entering_mess()
+{
+	FILE *f1;
+	FILE *f2;
+	char content[200],name[100],pass[100],meal[10];
+	char laundry[10],total[10];
+	strcpy(fname,Mess_Name);
+	strcat(fname,".txt");
+	strcpy(freq,Mess_Name);
+	strcat(freq,"_req.txt");
+	f1 = fopen(fname,"r");
+	f2 = fopen(freq,"r");
+	int i = 0;
+	while(fgets(content,200,f2))
+	{
+		sscanf(content,"%s %[^\n]s",name,pass);
+		strcpy(requests[i].name,name);
+		strcpy(requests[i].pass,pass);
+		requests[i].meal =0;
+		requests[i].laundry =0;
+		requests[i].total =0;
+		
+		i++;
+	}
+	reqidx =i;
+	fclose(f2);
+	i = 0;
+	int start = 0;
+	//fgets(content,200,f1);
+	while(fgets(content,200,f1))
+	{
+		if(!start){start+=1;continue;}
+		sscanf(content,"%s %s %s %s %[^\n]s",
+		Students[i].pass,meal,laundry,total,
+		Students[i].name);
+		Students[i].meal = atoi(meal);
+		Students[i].laundry = atoi(laundry);
+		Students[i].total = atoi(total);
+		//cout<<Students[i].name<<" "<<Students[i].pass<<" "
+		//<<Students[i].meal<<" "<<Students[i].laundry<<endl;
+		i++;
+	}
+	stidx= i;
+	fclose(f1);
+}
 
 void delete_line(int index,char *filename)
 {
@@ -884,6 +932,7 @@ void iMouse(int button, int state, int mx, int my)
 			{	req_log_page = 1;
 				Join_page=0;
 				wrMessname = 0;
+				entering_mess();
 				fclose(fptr);
 			}
 			else if(Mess_name_index ==0 || fptr == NULL)
@@ -1074,10 +1123,24 @@ void iMouse(int button, int state, int mx, int my)
 				write_sname =0;
 				write_spass = 0;
 				//printf("%d\n",check_login());
+				/*
 				if(check_login() == 1)
 				{
 					Student_page = 1;
 					req_log_page =0;
+				}
+				*/
+				//int flag = 0;
+				for(int i=0;i<stidx;i++)
+				{
+					if(strcmp(Students[i].name,check_name)
+					== 0 && strcmp(Students[i].pass,
+					check_pass) ==0)
+					{
+						Student_page = 1;
+						req_log_page =0;
+						break;
+					}
 				}
 				
 			}
