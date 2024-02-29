@@ -18,6 +18,7 @@ using namespace std;
 #define antique_white 250,235,215
 #define indigo 75,0,130
 #define yellow 255,255,0
+#define blue_violet 138,43,226
 /*
 	function iDraw() is called again and again by the system.
 
@@ -28,7 +29,7 @@ typedef struct student
 	char name[200],pass[200];
 	int meal ;//35 per meal
 	int laundry ;//30 per dress
-	int total = 35*meal+30*laundry;
+	int total;
 };
 
 
@@ -48,11 +49,10 @@ int invalid_option = 0;
 //for mess page
 char fname[200],freq[200] ;//mess file name
 FILE * fptr;FILE *fptr2;//for opening  and reading mess file
-//double wr_x = screenWidth / 2, wr_y = screenHeight / 2 + Mess_y * 1.7;
-//double wr_xpass = screenWidth / 2, wr_ypass = screenHeight / 2;
+
+//for mess page
 int Mess_page = 0;
-//double MessPage_x = screenWidth/50 ,MessPage_dy= screenHeight/10;
-//double MessPage_y = screenHeight - 2*MessPage_dy;//640
+
 
 //Login or request page
 int req_log_page = 0,sname_index = 0 ,spass_index = 0;
@@ -60,22 +60,33 @@ student s1 ={"","",0,0,0};
 int write_sname = 0,write_spass = 0,check = 0;
 int req =0,wrong_pass =0;
 char check_name[100],check_pass[100],manager_pass[100];
-char req_content[100];
-student requests[500];int reqidx =0,req_page = 0;
+char req_content[100],buffer[100];
+student requests[500];int reqidx =0;
+student st;
+int req_page = 0;
 char num[100];//for index meal,laundry total cost;
-int selectidx = -1;
+int selectidx = -1;//for req page
+int current_idx = -1;//for login info
 //for scrolling 
 double starty = 0,dy =0,endy =0;
 
+
+//for Student page
+int stidx  = 0;
+char meal1[10],laundry1[10],total1[10];
 
 double total_cost = 0,laudry_cost = 0,meal_cost =0;
 char tcoststr[100] = "123",lcoststr[100],tmcost[100];
 int Student_page = 0;
 int meal_order = 0,laundry_order = 0;
-char meal_num[100] ="0" ,laundry_num[100] = "0",student_name[100]="Aritro";
-char meal_cost_str[100] = "0",laundry_cost_str[100] ="0",total_cost_str[100]="0";
+char meal_num[100] ="0" ,laundry_num[100] = "0";
+char student_name[100]="Aritro";
+char meal_cost_str[100] = "0",laundry_cost_str[100] ="0";
+char total_cost_str[100]="0";
 int draw_mem = 0,draw_man =0;
+
 //for student_info_page
+
 int student_info_page = 0;
 int students_num = 1;
 student Students[500];
@@ -111,6 +122,31 @@ void delete_line(int index,char *filename)
     remove(filename);
     rename(tempfile,filename);
 }
+void set_students()
+{
+	FILE *fptr3;
+	strcpy(fname,Mess_Name);
+	strcat(fname,".txt");
+	//delete_line(selectidx,freq);
+	//set_requests();
+	stidx =0;
+	int temp =0;
+	char meal[10],laundry[10],total[10];
+	fptr3 = fopen(fname,"r");
+	while(fgets(buffer,100,fptr3))
+	{	
+		if(temp == 0){temp++;continue;}
+		sscanf(buffer,"%s %s %s %s %[^\n]s",
+		Students[stidx].pass,meal,laundry,total
+		,Students[stidx].name);
+		Students[stidx].meal = atoi(meal);
+		Students[stidx].laundry = atoi(laundry);	
+		Students[stidx].total = atoi(total);
+		//printf("%s\n",requets[reqidx].name);
+		stidx++;
+	}
+	fclose(fptr3);
+}
 void set_requests()
 {
 	FILE *fptr3;
@@ -132,6 +168,40 @@ void set_requests()
 		reqidx++;
 	}
 	fclose(fptr3);
+}
+
+int check_login()
+{
+  strcpy(fname,Mess_Name);
+  strcat(fname,".txt");
+  FILE *f = fopen(fname,"r");
+  int i =1,fl =0;
+  char meal[10],laundry[10],total[10];
+  while (fgets(buffer, 100, f))
+  {
+    if(i==1){i++;continue;}
+    sscanf(buffer, "%s %s %s %s %[^\n]s",check_pass,
+	meal,laundry,total,
+	check_name);
+    //printf("%s -> %s\n",check_name,check_pass);
+    if(strcmp(s1.name,check_name)== 0 
+    && strcmp(s1.pass,check_pass)== 0)
+    {
+      //printf("FOUND\n");
+	  //sscanf(buffer, "%*s %s %s %s %*s",s1.meal,
+	  //s1.laundry,s1.total);
+	  s1.meal = atoi(meal);
+	  s1.laundry = atoi(laundry);
+	  s1.total = atoi(total);
+      fl = 1;
+      fclose(f);break;
+    }
+    i++;
+  }
+  //printf("%d\n",i);
+  current_idx = i;
+  fclose(f);
+  return fl;
 }
 
 //int Join_page = 0;
@@ -281,91 +351,158 @@ void iDraw()
 		iSetColor(indigo);
 		//iRectangle(24,640,200,200.00/3);
 		//iSetColor(antique_white);
-		iRectangle(24,640,1000,200.00/3);
-		iRectangle(29,645,990,170.00/3);
-		iText(1087/3+170,650,"COST = ",GLUT_BITMAP_HELVETICA_18);
-		iRectangle(24,640,500,200.00/3);
-		iRectangle(29,645,490,170.0/3);
-		iRectangle(29,645,190,170.0/3);
+		iFilledRectangle(25,640,200,65);
+		iSetColor(blue_violet);
+		iFilledRectangle(30,645,190,55);
+		iSetColor(yellow);
 		iText(34,670,"MEAL\n OREDERS",GLUT_BITMAP_HELVETICA_18);
+		iSetColor(indigo);
+		iRectangle(225,640,300,65);
+		iRectangle(230,645,290,55);
+		iRectangle(525,640,500,65);
+		iRectangle(530,645,490,55);
+		iText(540,655,"COST = ",GLUT_BITMAP_HELVETICA_18);
+		//iRectangle(24,640,500,200.00/3);
+		//iRectangle(29,645,490,170.0/3);
+		//iRectangle(29,645,190,170.0/3);
+		
 		//For Laundry order box
-		iRectangle(24,1720.0/3,200,200.0/3);
-		iRectangle(24,1720.0/3,1000,200.0/3);
-		iRectangle(29,1735.0/3,990,170.0/3);
-		iRectangle(24,1720.0/3,500,200.0/3);
-		iRectangle(29,1735.0/3,490,170.0/3);
-		iText(529,1750.0/3,"COST = ",GLUT_BITMAP_HELVETICA_18);
-		iRectangle(29,1735.0/3,190,170.0/3);
-		iText(34,1825.0/3,"LAUNDRY\n OREDERS",GLUT_BITMAP_HELVETICA_18);
-		//For Total cost box;
-		iRectangle(24,1520.0/3,200,200.0/3);
-		iRectangle(29,1535.0/3,190,170.0/3);
-		iRectangle(24,1520.0/3,1000,200.0/3);
-		iRectangle(29,1535.0/3,990,170.0/3);
-		iText(229,526.66,tcoststr,GLUT_BITMAP_HELVETICA_18);
-		iText(34,541.66,"TOTAL COST",GLUT_BITMAP_HELVETICA_18);
-		//For Total students
-		iRectangle(24,440,200,200.0/3);
-		iRectangle(29,445,190,170.0/3);
-		iRectangle(24,440,1000,200.0/3);
-		iRectangle(29,445,990,170.0/3);
-		iText(229,460,tcoststr,GLUT_BITMAP_HELVETICA_18);
-		iText(34,475,"TOTAL STUDENTS",GLUT_BITMAP_HELVETICA_18);
+		
+		iSetColor(indigo);
+		//iRectangle(24,640,200,200.00/3);
+		//iSetColor(antique_white);
+		iFilledRectangle(25,565,200,65);
+		iSetColor(blue_violet);
+		iFilledRectangle(30,570,190,55);
+		iSetColor(yellow);
+		iText(34,595,"LAUNDRY\n OREDERS",GLUT_BITMAP_HELVETICA_18);
+		iSetColor(indigo);
+		iRectangle(225,565,300,65);
+		iRectangle(230,570,290,55);
+		iRectangle(525,565,500,65);
+		iRectangle(530,570,490,55);
+		iText(540,580,"COST = ",GLUT_BITMAP_HELVETICA_18);
+
+		//For Total cost Box
+		iSetColor(indigo);
+		//iRectangle(24,640,200,200.00/3);
+		//iSetColor(antique_white);
+		iFilledRectangle(25,490,200,65);
+		iSetColor(blue_violet);
+		iFilledRectangle(30,495,190,55);
+		iSetColor(yellow);
+		iText(34,520,"TOTAL COST",GLUT_BITMAP_HELVETICA_18);
+		iSetColor(indigo);
+		iRectangle(225,490,800,65);
+		iRectangle(230,495,790,55);
+		
+
+		
+		
 		//For students info
-		iRectangle(24,1120.0/3,200,200.0/3);
-		iRectangle(29,1135.0/3,190,170.0/3);
-		iText(34,1225.0/3,"STUDENTS INFO",GLUT_BITMAP_HELVETICA_18);
+		iSetColor(blue_violet);
+		iFilledRectangle(25,375,200,65);
+		iSetColor(indigo);
+		iFilledRectangle(30,380,190,55);
+		iSetColor(yellow);
+		iText(35,390,"STUDENTS INFO",GLUT_BITMAP_HELVETICA_18);
 		//For requests
-		iRectangle(25,300,200,70);
-		iText(35,310,"Requests",
+		iSetColor(blue_violet);
+		iFilledRectangle(25,300,200,70);
+		iSetColor(indigo);
+		iFilledRectangle(30,305,190,60);
+		iSetColor(yellow);
+		iText(35,320,"Requests",
 		GLUT_BITMAP_TIMES_ROMAN_24);
-		iRectangle(30,305,190,60);
-		//MessPage_y -= MessPage_dy;
+		
+		//for back button
+		iSetColor(indigo);
+		iFilledRectangle(25,200,100,65);
+		iSetColor(blue_violet);
+		iFilledRectangle(30,205,90,55);
+		iSetColor(yellow);
+		iText(35,210,"BACK",GLUT_BITMAP_TIMES_ROMAN_24);
 	
 	}
 	else if(Student_page)
 	{
-		iSetColor(black);
+		iSetColor(indigo);
 		//For Student name
-		iRectangle(34,590,200,200.0/3);
-		iRectangle(39,595,190,170.0/3);
-		iText(44,600,"Name",GLUT_BITMAP_TIMES_ROMAN_24);
-		iText(244,600,student_name,GLUT_BITMAP_TIMES_ROMAN_24);
-		iRectangle(34,590,800,200.0/3);
-		iRectangle(234,590,800,200.0/3);
-		iRectangle(239,595,590,170.0/3);
-		//iRectangle(MessPage_x+15+screenWidth/1.5,MessPage_y-45,screenWidth/6-10,screenHeight/12-10); Use it for Change box
-		iText(849,605,"Change",GLUT_BITMAP_TIMES_ROMAN_24);
+		iFilledRectangle(35,590,200,65);
+		iSetColor(antique_white);
+		//iFilledRectangle(40,595,190,55);
+		iSetColor(yellow);
+		iText(45,600,"Name",GLUT_BITMAP_TIMES_ROMAN_24);
+		iSetColor(black);
+		iText(245,600,s1.name,GLUT_BITMAP_TIMES_ROMAN_24);
+		iSetColor(indigo);
+		iRectangle(235,590,600,65);
+		iFilledRectangle(835,590,200,65);
+		iRectangle(240,595,590,55);
+		iSetColor(yellow);
+		iText(850,605,"Change",GLUT_BITMAP_TIMES_ROMAN_24);
 
 		//For Meal order
-		iRectangle(34,1570.0/3,200,800.0/12);
-		iRectangle(39,1585.0/3,190,170.0/3);
-		iText(44,1600.0/3,"Meal Order",GLUT_BITMAP_TIMES_ROMAN_24);
-		iRectangle(34,1570.0/3,800,200.0/3);
-		iRectangle(834,523.33,200,66.66);
-		iRectangle(234,523.33,800,66.66);
-		iRectangle(239,528.33,590,56.66);
-		iText(244,533.33,meal_num,GLUT_BITMAP_TIMES_ROMAN_24);
+		iSetColor(indigo);
+		iFilledRectangle(35,515,200,65);
+		//iRectangle(40,520,190,55);
+		iSetColor(yellow);
+		iText(45,520,"Meal Order",GLUT_BITMAP_TIMES_ROMAN_24);
+		iSetColor(indigo);
+		iRectangle(235,515,600,65);
+		//iRectangle(834,523.33,200,66.66);
+		//iRectangle(234,523.33,800,66.66);
+		iRectangle(240,520,590,55);
+		iFilledCircle(860,540,20,1000);//Plus button
+		iSetColor(yellow);
+		iText(855,535,"+",GLUT_BITMAP_TIMES_ROMAN_24);
+		//minus button
+		iSetColor(indigo);
+		iFilledCircle(910,540,20,1000);
+		iSetColor(yellow);
+		iText(905,535,"-",GLUT_BITMAP_TIMES_ROMAN_24);
+		//iText(244,533.33,meal_num,GLUT_BITMAP_TIMES_ROMAN_24);
+		
 		//For laundry order
-		iRectangle(34,456.66,200,66.66);
-		iRectangle(39,461.66,190,56.66);
-		iText(44,466.67,"Laundry Order",GLUT_BITMAP_TIMES_ROMAN_24);
-		iRectangle(34,456.66,800,66.66);
-		iRectangle(834,456.66,200,66.66);
-		iRectangle(234,456.66,800,66.66);
-		iRectangle(239,461.66,590,56.66);
-		iText(244,466.66,laundry_num,GLUT_BITMAP_TIMES_ROMAN_24);
-		//For Password 
-		iRectangle(34,390,200,66.66);
-		iRectangle(39,395,190,56.66);
-		iText(44,400,"Password",GLUT_BITMAP_TIMES_ROMAN_24);
-		iRectangle(34,390,800,66.66);
-		iRectangle(834,390,200,66.66);
-		iRectangle(234,390,800,66.66);
-		iRectangle(239,395,590,56.66);
-		iText(849,405,"Change",GLUT_BITMAP_TIMES_ROMAN_24);
+		iSetColor(indigo);
+		iFilledRectangle(35,440,200,65);
+		//iRectangle(40,445,190,55);
+		iSetColor(yellow);
+		iText(45,450,"Laundry Order",GLUT_BITMAP_TIMES_ROMAN_24);
+		iSetColor(indigo);
+		iRectangle(235,440,600,65);
+		iRectangle(240,445,590,55);
+		//iRectangle(240,520,590,55);
+		iFilledCircle(860,470,20,1000);//Plus button
+		iSetColor(yellow);
+		iText(855,465,"+",GLUT_BITMAP_TIMES_ROMAN_24);
+		//minus button
+		iSetColor(indigo);
+		iFilledCircle(910,470,20,1000);
+		iSetColor(yellow);
+		iText(905,465,"-",GLUT_BITMAP_TIMES_ROMAN_24);
+		//iRectangle(834,456.66,200,66.66);
+		//iRectangle(234,456.66,800,66.66);
+		//iRectangle(239,461.66,590,56.66);
+		//iText(244,466.66,laundry_num,GLUT_BITMAP_TIMES_ROMAN_24);
+		
+		//For Password
+		iSetColor(indigo); 
+		iFilledRectangle(35,360,200,65);
+		//iRectangle(40,365,190,55);
+		iSetColor(yellow);
+		iText(45,370,"Password",GLUT_BITMAP_TIMES_ROMAN_24);
+		iSetColor(indigo);
+		iRectangle(235,360,600,65);
+		//iRectangle(240,365,590,55);
+		iFilledRectangle(835,360,200,65);
+		//iRectangle(235,350,800,66.66);
+		//iRectangle(240,355,590,56.66);
+		iSetColor(yellow);
+		iText(850,375,"Change",GLUT_BITMAP_TIMES_ROMAN_24);
 		//iRectangle(MessPage_x+15+screenWidth/1.5,MessPage_y-45-3*screenHeight/12,screenWidth/6-10,screenHeight/12-10); //Use it for Change box
-
+		//for total meal and laundry costs
+		iSetColor(indigo);
 		iRectangle(400,200,400,100);
 		iRectangle(400,200,400,50);
 		iRectangle(400,250,150,50);
@@ -716,7 +853,7 @@ void iMouse(int button, int state, int mx, int my)
 		
 		else if((mx-900)
 		*(mx-900)
-		+ (my-400)*(my-400)<= 169)
+		+ (my-400)*(my-400)<= 169)//member
 		{
 			draw_mem = 1;
 			invalid_option =0;
@@ -726,7 +863,7 @@ void iMouse(int button, int state, int mx, int my)
 		}
 		else if((mx-450)
 		*(mx-450)
-		+ (my-400)*(my-400)<= 169)
+		+ (my-400)*(my-400)<= 169)//manager
 		{
 			//cout<<"OK"<<endl;
 			draw_man =1;
@@ -747,6 +884,7 @@ void iMouse(int button, int state, int mx, int my)
 			{	req_log_page = 1;
 				Join_page=0;
 				wrMessname = 0;
+				fclose(fptr);
 			}
 			else if(Mess_name_index ==0 || fptr == NULL)
 			{
@@ -754,11 +892,13 @@ void iMouse(int button, int state, int mx, int my)
 				Mess_name_index = 0;
 				//Mess_pass_index = 0;
 				Mess_Name[Mess_name_index] = '\0';
+				fclose(fptr);
 				//wrMessname = 0;
 			}
 			else
 			{
 				invalid_option = 1;
+				fclose(fptr);
 			}
 		}
 		else if (mx >= 250 && mx <= 325 && 
@@ -810,7 +950,7 @@ void iMouse(int button, int state, int mx, int my)
 			Mess_page = 0;
 		}
 	}
-	else if( req_page)
+	else if( req_page)//REQ page
 	{
 		if(mx>=700 && mx<=800 && my>=600 && my<=640 &&
 		button == GLUT_LEFT_BUTTON && 
@@ -893,7 +1033,7 @@ void iMouse(int button, int state, int mx, int my)
 			}
 		}
 	}
-	//req_log_page();
+	//Req_log_page();
 	else if(button == GLUT_LEFT_BUTTON &&
 	 state == GLUT_UP && req_log_page)
 	{
@@ -915,18 +1055,31 @@ void iMouse(int button, int state, int mx, int my)
 				req =0,check = 0;
 			}
 			else if(mx>=510 && mx<=810 &&
-			my>= 500 && my<=550)
+			my>= 500 && my<=550)//writring name
 			{
 				write_sname =1;
 				write_spass =0;
 				req = 0,check = 0;
 			}
 			else if(mx>=510&& mx<=810
-			&& my>=400 && my<=450)
+			&& my>=400 && my<=450)//writing password
 			{
 				write_sname =0;
 				write_spass= 1;
 				req  =0,check = 0;
+			}
+			else if(mx>=500 && mx<=600
+			&& my>=300 && my<=350)//login
+			{
+				write_sname =0;
+				write_spass = 0;
+				//printf("%d\n",check_login());
+				if(check_login() == 1)
+				{
+					Student_page = 1;
+					req_log_page =0;
+				}
+				
 			}
 			else if(mx>=700 && mx<=800
 			&& my>=300 && my<=350)//request 
