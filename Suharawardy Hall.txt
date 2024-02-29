@@ -1,10 +1,10 @@
 Manager_pass:Aritro123
 Joy_bangla 2 1 0 Nefaur Nibir
-123 0 0 0 Libir boy
-123 0 3 0 Hello boyyyyyyyyy
-1234 0 0 0 Aritro Biswas
-1234Sir 0 0 0 Aritro Shankar Biswas
-123 0 0 0 Ashok gupta
-123 0 10 0 Oyshik roy
-123 0 12 0 Faysal ahmed
-123 14 0 0 nil akash
+123 5 1 190 Libir boy
+123 6 2 240 Hello boyyyyyyyyy
+JoyBangla_1234 2 3 115 Aritro Biswas
+1234Sir 6 8 330 Aritro Shankar Biswas
+Atrain 9 7 420 Ashok gupta
+123123 4 8 260 Oyshik roy
+123 4 7 245 Faysal ahmed
+123 14 2 520 nil akash

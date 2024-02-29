@@ -52,7 +52,9 @@ FILE * fptr;FILE *fptr2;//for opening  and reading mess file
 
 //for mess page
 int Mess_page = 0;
-
+int total_costs = 0,laundrys_orders = 0;
+int meals_orders = 0; 
+int laundrys_cost = 0,meals_cost =0;
 
 //Login or request page
 int req_log_page = 0,sname_index = 0 ,spass_index = 0;
@@ -76,16 +78,21 @@ double starty = 0,dy =0,endy =0;
 
 //for Student page
 int stidx  = 0;
+int totalStudents = 0;
 char meal1[10],laundry1[10],total1[10];
+int mealcost1,laundrycost1,totalcost1;
+int change_pass = 0;
+int stpasslen;
+int change = 0;
 
-double total_cost = 0,laudry_cost = 0,meal_cost =0;
+
 char tcoststr[100] = "123",lcoststr[100],tmcost[100];
 int Student_page = 0;
 int meal_order = 0,laundry_order = 0;
 char meal_num[100] ="0" ,laundry_num[100] = "0";
 char student_name[100]="Aritro";
-char meal_cost_str[100] = "0",laundry_cost_str[100] ="0";
-char total_cost_str[100]="0";
+char meal_cost_str[100],laundry_cost_str[100];
+char total_cost_str[100];
 int draw_mem = 0,draw_man =0;
 
 //for student_info_page
@@ -100,8 +107,33 @@ int Nameidx = 0,Passidx =0;
 char each_name[100],each_pass[100];
 
 
+void student_update(char * filename)
+{
+	char temp[100] = "temp__";
+	
+	strcat(temp,filename);
+	
+	strcat(temp,".txt");
+	FILE * f1 = fopen(temp,"a");
+	FILE * f2 = fopen(filename,"r");
+	char content[100];
+	fgets(content,100,f2);
+	fprintf(f1,"%s",content);
+	fclose(f2);
+	for(int i =0;i<totalStudents;i++)
+	{
+		fprintf(f1,"%s %d %d %d %s\n",
+		Students[i].pass,Students[i].meal,Students[i].laundry,
+		Students[i].total,Students[i].name);
+	}
+	fclose(f1);
+	remove(filename);
+	rename(temp,filename);
+}
+
 void entering_mess()
 {
+	int total_ =0,meals_ = 0,laundrys_ = 0;
 	FILE *f1;
 	FILE *f2;
 	char content[200],name[100],pass[100],meal[10];
@@ -138,11 +170,19 @@ void entering_mess()
 		Students[i].meal = atoi(meal);
 		Students[i].laundry = atoi(laundry);
 		Students[i].total = atoi(total);
+		total_+= Students[i].total;
+		meals_ += Students[i].meal;
+		laundrys_ += Students[i].total;
 		//cout<<Students[i].name<<" "<<Students[i].pass<<" "
 		//<<Students[i].meal<<" "<<Students[i].laundry<<endl;
 		i++;
 	}
-	stidx= i;
+	totalStudents = i;
+	meals_orders = meals_;
+	laundrys_orders = laundrys_;
+	meals_cost = meals_orders*35;
+	laundrys_cost = laundrys_orders*15;
+	total_costs = meals_cost+laundrys_cost;
 	fclose(f1);
 }
 
@@ -219,7 +259,7 @@ void set_requests()
 	fclose(fptr3);
 }
 
-int check_login()
+/* int check_login()
 {
   strcpy(fname,Mess_Name);
   strcat(fname,".txt");
@@ -251,7 +291,7 @@ int check_login()
   current_idx = i;
   fclose(f);
   return fl;
-}
+} */
 
 //int Join_page = 0;
 
@@ -483,13 +523,14 @@ void iDraw()
 		iSetColor(yellow);
 		iText(45,600,"Name",GLUT_BITMAP_TIMES_ROMAN_24);
 		iSetColor(black);
-		iText(245,600,s1.name,GLUT_BITMAP_TIMES_ROMAN_24);
+		iText(245,600,Students[stidx].name,
+		GLUT_BITMAP_TIMES_ROMAN_24);
 		iSetColor(indigo);
 		iRectangle(235,590,600,65);
-		iFilledRectangle(835,590,200,65);
-		iRectangle(240,595,590,55);
-		iSetColor(yellow);
-		iText(850,605,"Change",GLUT_BITMAP_TIMES_ROMAN_24);
+		//iFilledRectangle(835,590,200,65);
+		//iRectangle(240,595,590,55);
+		//iSetColor(yellow);
+		//iText(850,605,"Change",GLUT_BITMAP_TIMES_ROMAN_24);
 
 		//For Meal order
 		iSetColor(indigo);
@@ -497,10 +538,11 @@ void iDraw()
 		//iRectangle(40,520,190,55);
 		iSetColor(yellow);
 		iText(45,520,"Meal Order",GLUT_BITMAP_TIMES_ROMAN_24);
+		iSetColor(black);
+		iText(245,530,meal1,GLUT_BITMAP_TIMES_ROMAN_24);
 		iSetColor(indigo);
 		iRectangle(235,515,600,65);
-		//iRectangle(834,523.33,200,66.66);
-		//iRectangle(234,523.33,800,66.66);
+		
 		iRectangle(240,520,590,55);
 		iFilledCircle(860,540,20,1000);//Plus button
 		iSetColor(yellow);
@@ -518,6 +560,8 @@ void iDraw()
 		//iRectangle(40,445,190,55);
 		iSetColor(yellow);
 		iText(45,450,"Laundry Order",GLUT_BITMAP_TIMES_ROMAN_24);
+		iSetColor(black);
+		iText(245,450,laundry1,GLUT_BITMAP_TIMES_ROMAN_24);
 		iSetColor(indigo);
 		iRectangle(235,440,600,65);
 		iRectangle(240,445,590,55);
@@ -530,10 +574,7 @@ void iDraw()
 		iFilledCircle(910,470,20,1000);
 		iSetColor(yellow);
 		iText(905,465,"-",GLUT_BITMAP_TIMES_ROMAN_24);
-		//iRectangle(834,456.66,200,66.66);
-		//iRectangle(234,456.66,800,66.66);
-		//iRectangle(239,461.66,590,56.66);
-		//iText(244,466.66,laundry_num,GLUT_BITMAP_TIMES_ROMAN_24);
+		
 		
 		//For Password
 		iSetColor(indigo); 
@@ -541,6 +582,9 @@ void iDraw()
 		//iRectangle(40,365,190,55);
 		iSetColor(yellow);
 		iText(45,370,"Password",GLUT_BITMAP_TIMES_ROMAN_24);
+		iSetColor(black);
+		iText(245,370,Students[stidx].pass,
+		GLUT_BITMAP_TIMES_ROMAN_24);
 		iSetColor(indigo);
 		iRectangle(235,360,600,65);
 		//iRectangle(240,365,590,55);
@@ -549,20 +593,54 @@ void iDraw()
 		//iRectangle(240,355,590,56.66);
 		iSetColor(yellow);
 		iText(850,375,"Change",GLUT_BITMAP_TIMES_ROMAN_24);
-		//iRectangle(MessPage_x+15+screenWidth/1.5,MessPage_y-45-3*screenHeight/12,screenWidth/6-10,screenHeight/12-10); //Use it for Change box
+		
 		//for total meal and laundry costs
+		
+		iSetColor(blue_violet);
+		iFilledRectangle(400,200,150,50);
 		iSetColor(indigo);
-		iRectangle(400,200,400,100);
-		iRectangle(400,200,400,50);
-		iRectangle(400,250,150,50);
-		iRectangle(400,200,150,50);
+		iFilledRectangle(405,205,140,40);
+		iSetColor(blue_violet);
+		iFilledRectangle(400,250,150,50);
+		iSetColor(indigo);
+		iFilledRectangle(405,255,140,40);
+		iRectangle(550,250,250,50);
+		iRectangle(550,200,250,50);
+		//iRectangle(400,200,150,50);
+		iSetColor(black);
 		iText(410,270,"Meal cost",GLUT_BITMAP_TIMES_ROMAN_24);
+		iText(740,270,"Tk",GLUT_BITMAP_TIMES_ROMAN_24);
+		//iSetColor(black);
 		iText(560,270,meal_cost_str,GLUT_BITMAP_TIMES_ROMAN_24);
 		iText(410,210,"Laundry cost",GLUT_BITMAP_TIMES_ROMAN_24);
+		iText(740,210,"Tk",GLUT_BITMAP_TIMES_ROMAN_24);
+		//iSetColor(black);
 		iText(560,210,laundry_cost_str,GLUT_BITMAP_TIMES_ROMAN_24);
 		iRectangle(800,200,200,100);
 		iText(820,250,total_cost_str,
 		GLUT_BITMAP_TIMES_ROMAN_24);
+		iText(950,250,"TK",GLUT_BITMAP_TIMES_ROMAN_24);
+
+		//back Button
+		iSetColor(indigo);
+		iFilledRectangle(35,100,100,50);
+		iSetColor(yellow);
+		iText(40,105,"BACK",
+		GLUT_BITMAP_TIMES_ROMAN_24);
+		if(change_pass)
+		{
+			iSetColor(indigo);
+			iRectangle(240,365,590,55);
+		}
+		if(change )
+		{
+			iSetColor(indigo);
+			iFilledRectangle(400,100,350,50);
+			iSetColor(yellow);
+			iText(400,120,"Password Changed Successfully!",
+			GLUT_BITMAP_TIMES_ROMAN_24);
+		}
+
 		
 
 
@@ -1136,16 +1214,8 @@ void iMouse(int button, int state, int mx, int my)
 			{
 				write_sname =0;
 				write_spass = 0;
-				//printf("%d\n",check_login());
-				/*
-				if(check_login() == 1)
-				{
-					Student_page = 1;
-					req_log_page =0;
-				}
-				*/
-				//int flag = 0;
-				for(int i=0;i<stidx;i++)
+				
+				for(int i=0;i<totalStudents;i++)
 				{
 					if(strcmp(Students[i].name,s1.name)
 					== 0 && strcmp(Students[i].pass,
@@ -1154,6 +1224,24 @@ void iMouse(int button, int state, int mx, int my)
 						Student_page = 1;
 						req_log_page =0;
 						check_student = 1;
+						stidx = i;
+						sname_index = 0;
+						spass_index = 0;
+						s1.name[sname_index] = '\0';
+						s1.pass[spass_index] = '\0';
+						sprintf(meal1,"%d",Students[i].meal);
+						sprintf(laundry1,"%d",Students[i].laundry);
+						//Students[i].total = Students[i].meal * 35 + 
+						//Students[i].laundry *15;total);
+						sprintf(total1,"%d",Students[i].total);
+						mealcost1 = Students[i].meal *35;
+						laundrycost1 = Students[i].laundry*15;
+						Students[i].total = mealcost1 + laundrycost1;
+						sprintf(laundry_cost_str,"%d",laundrycost1);
+						sprintf(meal_cost_str,"%d",mealcost1);
+						sprintf(total_cost_str,"%d",
+						Students[i].total);
+						stpasslen = strlen(Students[i].pass);
 						
 						break;
 					}
@@ -1211,6 +1299,7 @@ void iMouse(int button, int state, int mx, int my)
 				write_spass = 0;
 				wrong_student = 0;
 				check = 0;
+				check_student= 0;
 				req = 0;
 			}
 		}
@@ -1255,6 +1344,90 @@ void iMouse(int button, int state, int mx, int my)
 				draw_man =0;
 			}
 		}
+	}
+	else if(Student_page && state == GLUT_DOWN
+	&& button == GLUT_LEFT_BUTTON)
+	{
+		if((mx-860)*(mx-860)+
+		(my-540)*(my-540)<= 400)//increment meal order
+		{
+			Students[stidx].meal+=1;
+			sprintf(meal1,"%d",Students[stidx].meal);
+			mealcost1 = Students[stidx].meal *35;
+			sprintf(meal_cost_str,"%d",mealcost1);
+			Students[stidx].total = mealcost1 + laundrycost1;
+			sprintf(total_cost_str,"%d",Students[stidx].total);
+			strcpy(fname,Mess_Name);strcat(fname,".txt");
+			student_update(fname);
+		}
+		else if((mx-910)*(mx-910)+
+		(my-540)*(my-540)<= 400)//decrement meal order
+		{
+			Students[stidx].meal-=1;
+			if(Students[stidx].meal <= 0)
+			{Students[stidx].meal = 0;}
+			sprintf(meal1,"%d",Students[stidx].meal);
+			mealcost1 = Students[stidx].meal *35;
+			sprintf(meal_cost_str,"%d",mealcost1);
+			Students[stidx].total = mealcost1 + laundrycost1;
+			sprintf(total_cost_str,"%d",Students[stidx].total);
+			strcpy(fname,Mess_Name);
+			strcat(fname,".txt");
+			student_update(fname);
+		}
+		else if((mx-860)*(mx-860)+
+		(my-470)*(my-470)<= 400)//increment laundry order
+		{
+			Students[stidx].laundry+=1;
+			sprintf(laundry1,"%d",Students[stidx].laundry);
+			laundrycost1 = Students[stidx].laundry *15;
+			sprintf(laundry_cost_str,"%d",laundrycost1);
+			Students[stidx].total = mealcost1 + laundrycost1;
+			sprintf(total_cost_str,"%d",Students[stidx].total);
+			strcpy(fname,Mess_Name);strcat(fname,".txt");
+			student_update(fname);
+		}
+		else if((mx-910)*(mx-910)+
+		(my-470)*(my-470)<= 400)//decrement laundry order
+		{
+			Students[stidx].laundry-=1;
+			if(Students[stidx].laundry <= 0)
+			{Students[stidx].laundry = 0;}
+			sprintf(laundry1,"%d",Students[stidx].laundry);
+			laundrycost1 = Students[stidx].laundry *15;
+			sprintf(laundry_cost_str,"%d",laundrycost1);
+			Students[stidx].total = mealcost1 + laundrycost1;
+			sprintf(total_cost_str,"%d",Students[stidx].total);
+			strcpy(fname,Mess_Name);strcat(fname,".txt");
+			student_update(fname);
+		}
+		else if(mx>=235 && mx<=835
+		&& my>=360 && my<=425)//changing pass
+		{
+			change_pass = 1;
+		}
+		else if(mx>=835 && mx<=1035
+		&& my>= 360 && my<=425)//change button
+		{
+			change_pass = 0;
+			change = 1;
+			strcpy(fname,Mess_Name);strcat(fname,".txt");
+			student_update(fname);
+		}
+		else if(mx>=35 &&mx<135
+		&&my>=100 && my<=150)
+		{
+			change = 0;
+			change_pass = 0;
+			Student_page = 0;
+			req_log_page = 1;
+		}
+		else
+		{
+			change = 0;
+			change_pass = 0;
+		}
+		
 	}
 }
 
@@ -1430,6 +1603,25 @@ void iKeyboard(unsigned char key)
 			}
 		}
 	}
+	else if (Student_page)
+	{
+		if(change_pass)
+		{
+			if(key!='\b' && key!= ' ')
+			{
+				Students[stidx].pass[stpasslen] = key;
+				stpasslen++;
+				Students[stidx].pass[stpasslen] = '\0';
+			}
+			else if(key == '\b')
+			{
+				stpasslen--;
+				if(stpasslen<=0){stpasslen =0;}
+				Students[stidx].pass[stpasslen] = '\0';
+			}
+		}
+	}
+	
 	// place your codes for other keys here
 }
 
