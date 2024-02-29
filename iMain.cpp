@@ -57,6 +57,7 @@ int Mess_page = 0;
 //Login or request page
 int req_log_page = 0,sname_index = 0 ,spass_index = 0;
 student s1 ={"","",0,0,0};
+int wrong_student = 0,check_student = 0;
 int write_sname = 0,write_spass = 0,check = 0;
 int req =0,wrong_pass =0;
 char check_name[100],check_pass[100],manager_pass[100];
@@ -726,6 +727,14 @@ void iDraw()
 				iText(510,210,"Request has already been added",
 				GLUT_BITMAP_TIMES_ROMAN_24);
 			}
+			if(wrong_student)
+			{
+				iSetColor(indigo);
+				iText(520,410,"Wrong password",
+				GLUT_BITMAP_TIMES_ROMAN_24);
+				iText(520,510,"Wrong Username",
+				GLUT_BITMAP_TIMES_ROMAN_24);
+			}
 		}
 	}
 	if(req_page)
@@ -1102,6 +1111,9 @@ void iMouse(int button, int state, int mx, int my)
 				Mess_name_index = 0;
 				Mess_Name[Mess_name_index]= '\0';
 				req =0,check = 0;
+				wrong_student = 0;
+				write_sname = 0;
+				write_spass = 0;
 			}
 			else if(mx>=510 && mx<=810 &&
 			my>= 500 && my<=550)//writring name
@@ -1109,6 +1121,7 @@ void iMouse(int button, int state, int mx, int my)
 				write_sname =1;
 				write_spass =0;
 				req = 0,check = 0;
+				wrong_student = 0;
 			}
 			else if(mx>=510&& mx<=810
 			&& my>=400 && my<=450)//writing password
@@ -1116,6 +1129,7 @@ void iMouse(int button, int state, int mx, int my)
 				write_sname =0;
 				write_spass= 1;
 				req  =0,check = 0;
+				wrong_student =0;
 			}
 			else if(mx>=500 && mx<=600
 			&& my>=300 && my<=350)//login
@@ -1133,14 +1147,25 @@ void iMouse(int button, int state, int mx, int my)
 				//int flag = 0;
 				for(int i=0;i<stidx;i++)
 				{
-					if(strcmp(Students[i].name,check_name)
+					if(strcmp(Students[i].name,s1.name)
 					== 0 && strcmp(Students[i].pass,
-					check_pass) ==0)
+					s1.pass) == 0)
 					{
 						Student_page = 1;
 						req_log_page =0;
+						check_student = 1;
+						
 						break;
 					}
+					//cout<<Students[i].pass<<endl;
+				}
+				if(!check_student)
+				{
+					sname_index = 0;
+					spass_index = 0;
+					s1.name[sname_index] = '\0';
+					s1.pass[spass_index] = '\0';
+					wrong_student = 1;
 				}
 				
 			}
@@ -1179,6 +1204,14 @@ void iMouse(int button, int state, int mx, int my)
 				spass_index=0;
 				s1.name[sname_index] = '\0';
 				s1.pass[spass_index] = '\0';
+			}
+			else
+			{
+				write_sname = 0;
+				write_spass = 0;
+				wrong_student = 0;
+				check = 0;
+				req = 0;
 			}
 		}
 		if(draw_man)
