@@ -107,7 +107,7 @@ int wrName = 0,wrPass = 0,wridx ;
 int Nameidx = 0,Passidx =0;
 char each_name[100],each_pass[100];
 char num_index[100],each_mlt[100];
-int current_stidx =-1;
+int current_stidx =-1,clicked_st = 0;
 
 
 void student_update(char * filename)
@@ -359,21 +359,38 @@ void iDraw()
 	{
 		iSetColor(black);
 		iRectangle(450, 550, 450, 50); // upper big rectangle
-		iText(450, 570, "Mess Name", GLUT_BITMAP_TIMES_ROMAN_24);
-		iRectangle(450, 550, 150, 50);	// upper small rectangle
+		
+		iSetColor(blue);
+		iFilledRectangle(450, 550, 150, 50);	// upper small rectangle
+		iSetColor(dodger_blue);
+		iFilledRectangle(455, 555, 140, 40);
+		iSetColor(white);
+		iText(450, 570, "Mess Name", GLUT_BITMAP_TIMES_ROMAN_24);	
+		
 		//iRectangle(screenWidth / 2 - Mess_x / 2, screenHeight / 2 - Mess_y * .1, Mess_x * 1.5, Mess_y / 2); // lower big rectangle not whole
 		//iRectangle(screenWidth / 2 - Mess_x / 2, screenHeight / 2 - Mess_y * .1, Mess_x / 2, Mess_y / 2);	// lower big rectangle
 		//iText(screenWidth / 2 - Mess_x / 2, screenHeight / 2, "Password", GLUT_BITMAP_TIMES_ROMAN_24);
-		iText(605, 570, Mess_Name, GLUT_BITMAP_TIMES_ROMAN_24);								 // Mess name box text
-		iRectangle(600, 300, 150, 50);			 // Join button
-		iText(600, 320, "Join", GLUT_BITMAP_TIMES_ROMAN_24);		 // Join text
+		iSetColor(black);
+		iText(605, 570, Mess_Name, 
+		GLUT_BITMAP_TIMES_ROMAN_24);// Mess name box text
+		iSetColor(blue);
+		iFilledRectangle(600, 300, 150, 50);// Join button
+		iSetColor(dodger_blue);
+		iFilledRectangle(605, 305, 140, 40);// Join button
+		iSetColor(white);
+		iText(640, 320, "Join", GLUT_BITMAP_TIMES_ROMAN_24); // Join text
+		iSetColor(black);
 		iCircle(900, 400,10);//Member circle
 		iCircle(450, 400,10);//Manager circle
 		iText(465, 390, "Manager", GLUT_BITMAP_TIMES_ROMAN_24);
 		iText(915, 390,"Member",GLUT_BITMAP_TIMES_ROMAN_24);
-		//iText(wr_xpass+5, wr_ypass, Mess_pass, GLUT_BITMAP_TIMES_ROMAN_24);						 // mess pass text box
-		iRectangle(250, 220, 75, 100/ 2.3);		 // Back Button box
+		//iText(wr_xpass+5, wr_ypass, Mess_pass, GLUT_BITMAP_TIMES_ROMAN_24);// mess pass text box
+		iSetColor(blue);
+		iFilledRectangle(250, 220, 75, 100/ 2.3);// Back Button box
+		iFilledRectangle(255, 225, 65, 100/ 2.3-10);
+		iSetColor(white);
 		iText(250, 230, "Back", GLUT_BITMAP_TIMES_ROMAN_24); // Back text box
+		iSetColor(black);
 		if (wrMessname )
 		{
 			iRectangle(605,555,290,40);
@@ -434,9 +451,7 @@ void iDraw()
 		iText(630,655,total_mcost_str
 		,GLUT_BITMAP_HELVETICA_18);
 		iText(980,655,"TK",GLUT_BITMAP_HELVETICA_18);
-		//iRectangle(24,640,500,200.00/3);
-		//iRectangle(29,645,490,170.0/3);
-		//iRectangle(29,645,190,170.0/3);
+		
 		
 		//For Laundry order box
 		
@@ -477,8 +492,6 @@ void iDraw()
 		iSetColor(indigo);
 		iRectangle(225,490,800,65);
 		iRectangle(230,495,790,55);
-		
-
 		
 		
 		//For students info
@@ -1106,6 +1119,7 @@ void iMouse(int button, int state, int mx, int my)
 		{
 			Mess_page = 0;
 			student_info_page = 1;
+			current_stidx = -1;
 		}
 		else if(mx>=25 && mx<=225 && my>=300 && my<=370)
 		{
@@ -1129,6 +1143,7 @@ void iMouse(int button, int state, int mx, int my)
 			Mess_page =1;req_page = 0;
 			reqidx = 0;
 			selectidx = -1;
+			entering_mess();
 		}
 		if(mx>=700 &&mx<=800 && my>=700 && my<=740
 		&& button == GLUT_LEFT_BUTTON && 
@@ -1180,30 +1195,7 @@ void iMouse(int button, int state, int mx, int my)
 	else if(button == GLUT_LEFT_BUTTON && 
 	state == GLUT_DOWN && student_info_page)
 	{
-		// if(mx>=50&& mx<=150 &&
-		// my>=700 && my<=760)//Add
-		// {
-			
-		// 	students_num+=1;
-		// 	//Students[students_num-1] ={"Aritro","123",0,0,0};
-		// }
-		// for(int i=1;i<students_num;i++)
-		// {
-		// 	if(mx>=150&& mx<=350 && my>=700-60*i
-		// 	&& my<=760 -60*i)
-		// 	{
-		// 		wridx = i;
-		// 		wrName =1;
-		// 		wrPass = 0;
-		// 	}
-		// 	else if(mx>=950&& mx<=1150
-		// 	&& my>= 700 -60*i && my<= 760 -60*i)
-		// 	{
-		// 		wridx = i;
-		// 		wrName =0;
-		// 		wrPass = 1;
-		// 	}
-		// }
+		
 		if(mx>=700 &&mx<=800 &&
 		my>= 700 && my<=740)//back button
 		{
@@ -1225,12 +1217,18 @@ void iMouse(int button, int state, int mx, int my)
 			}
 		}
 		else{
+			int temp_clk=0;
 			for(int i=0;i<totalStudents;i++)
 			{
-				if(mx>=20 && mx<=570
+				if(mx>=20 && mx<=680
 				&& my>=650-i*50 &&my<= 700-i*50
 				)
-				{current_stidx = i;break;}
+				{current_stidx = i;
+				temp_clk = 1;break;}
+			}
+			if(temp_clk!=1)
+			{
+				current_stidx = -1;
 			}
 		}
 	}

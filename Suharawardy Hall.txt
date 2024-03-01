@@ -3,8 +3,9 @@ Joy_bangla 2 1 85 Nefaur Nibir
 123 5 1 190 Libir boy
 JoyBangla_1234 2 3 115 Aritro Biswas
 1234Sir 6 8 330 Aritro Shankar Biswas
-Atrain 9 7 420 Ashok gupta
 123123 4 8 260 Oyshik roy
 123 4 7 245 Faysal ahmed
 123 14 2 520 nil akash
-whatthe 0 0 0 ASBK roy
+!@#$ 2 2 100 ASBK roy
+joy 0 0 0 Salman khan
+Hello 0 0 0 Dev da
