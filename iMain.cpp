@@ -55,6 +55,10 @@ int Mess_page = 0;
 int total_costs = 0,laundrys_orders = 0;
 int meals_orders = 0; 
 int laundrys_cost = 0,meals_cost =0;
+char total_meals[100],total_laundry[100];
+char total_cost_str[100];
+char total_mcost_str[100];
+char total_lcost_str[100];
 
 //Login or request page
 int req_log_page = 0,sname_index = 0 ,spass_index = 0;
@@ -92,7 +96,7 @@ int meal_order = 0,laundry_order = 0;
 char meal_num[100] ="0" ,laundry_num[100] = "0";
 char student_name[100]="Aritro";
 char meal_cost_str[100],laundry_cost_str[100];
-char total_cost_str[100];
+//char total_cost_str[100];
 int draw_mem = 0,draw_man =0;
 
 //for student_info_page
@@ -147,7 +151,7 @@ void entering_mess()
 	int i = 0;
 	while(fgets(content,200,f2))
 	{
-		sscanf(content,"%s %[^\n]s",name,pass);
+		sscanf(content,"%s %[^\n]s",pass,name);
 		strcpy(requests[i].name,name);
 		strcpy(requests[i].pass,pass);
 		requests[i].meal =0;
@@ -183,6 +187,11 @@ void entering_mess()
 	meals_cost = meals_orders*35;
 	laundrys_cost = laundrys_orders*15;
 	total_costs = meals_cost+laundrys_cost;
+	sprintf(total_cost_str,"%d",total_costs);
+	sprintf(total_meals,"%d",meals_orders);
+	sprintf(total_laundry,"%d",laundrys_orders);
+	sprintf(total_lcost_str,"%d",laundrys_cost);
+	sprintf(total_mcost_str,"%d",meals_cost);
 	fclose(f1);
 }
 
@@ -243,55 +252,24 @@ void set_requests()
 	strcat(freq,"_req.txt");
 	delete_line(selectidx,freq);
 	//set_requests();
-	reqidx =0;
+	int i =0;
 	fptr3 = fopen(freq,"r");
 	while(fgets(req_content,100,fptr3))
 	{	
 		sscanf(req_content,"%s %[^\n]s",
-		requests[reqidx].pass
-		,requests[reqidx].name);
-		requests[reqidx].meal = 0;
-		requests[reqidx].laundry = 0;
-		requests[reqidx].total = 0;
+		requests[i].pass
+		,requests[i].name);
+		requests[i].meal = 0;
+		requests[i].laundry = 0;
+		requests[i].total = 0;
 		//printf("%s\n",requets[reqidx].name);
-		reqidx++;
+		i++;
 	}
+	reqidx =i;
 	fclose(fptr3);
 }
 
-/* int check_login()
-{
-  strcpy(fname,Mess_Name);
-  strcat(fname,".txt");
-  FILE *f = fopen(fname,"r");
-  int i =1,fl =0;
-  char meal[10],laundry[10],total[10];
-  while (fgets(buffer, 100, f))
-  {
-    if(i==1){i++;continue;}
-    sscanf(buffer, "%s %s %s %s %[^\n]s",check_pass,
-	meal,laundry,total,
-	check_name);
-    //printf("%s -> %s\n",check_name,check_pass);
-    if(strcmp(s1.name,check_name)== 0 
-    && strcmp(s1.pass,check_pass)== 0)
-    {
-      //printf("FOUND\n");
-	  //sscanf(buffer, "%*s %s %s %s %*s",s1.meal,
-	  //s1.laundry,s1.total);
-	  s1.meal = atoi(meal);
-	  s1.laundry = atoi(laundry);
-	  s1.total = atoi(total);
-      fl = 1;
-      fclose(f);break;
-    }
-    i++;
-  }
-  //printf("%d\n",i);
-  current_idx = i;
-  fclose(f);
-  return fl;
-} */
+
 
 //int Join_page = 0;
 
@@ -444,13 +422,19 @@ void iDraw()
 		iSetColor(blue_violet);
 		iFilledRectangle(30,645,190,55);
 		iSetColor(yellow);
-		iText(34,670,"MEAL\n OREDERS",GLUT_BITMAP_HELVETICA_18);
+		iText(35,670,"MEAL\n OREDERS",GLUT_BITMAP_HELVETICA_18);
+		iSetColor(indigo);
+		iText(235,670,total_meals,GLUT_BITMAP_HELVETICA_18);
 		iSetColor(indigo);
 		iRectangle(225,640,300,65);
 		iRectangle(230,645,290,55);
 		iRectangle(525,640,500,65);
 		iRectangle(530,645,490,55);
 		iText(540,655,"COST = ",GLUT_BITMAP_HELVETICA_18);
+		iSetColor(indigo);
+		iText(630,655,total_mcost_str
+		,GLUT_BITMAP_HELVETICA_18);
+		iText(980,655,"TK",GLUT_BITMAP_HELVETICA_18);
 		//iRectangle(24,640,500,200.00/3);
 		//iRectangle(29,645,490,170.0/3);
 		//iRectangle(29,645,190,170.0/3);
@@ -466,11 +450,18 @@ void iDraw()
 		iSetColor(yellow);
 		iText(34,595,"LAUNDRY\n OREDERS",GLUT_BITMAP_HELVETICA_18);
 		iSetColor(indigo);
+		iText(235,595,total_laundry,GLUT_BITMAP_HELVETICA_18);
+		iSetColor(indigo);
 		iRectangle(225,565,300,65);
 		iRectangle(230,570,290,55);
 		iRectangle(525,565,500,65);
 		iRectangle(530,570,490,55);
 		iText(540,580,"COST = ",GLUT_BITMAP_HELVETICA_18);
+		iSetColor(indigo);
+		iText(630,580,total_lcost_str,
+		GLUT_BITMAP_HELVETICA_18);
+		iText(980,580,"TK",GLUT_BITMAP_HELVETICA_18);
+
 
 		//For Total cost Box
 		iSetColor(indigo);
@@ -481,6 +472,9 @@ void iDraw()
 		iFilledRectangle(30,495,190,55);
 		iSetColor(yellow);
 		iText(34,520,"TOTAL COST",GLUT_BITMAP_HELVETICA_18);
+		iSetColor(indigo);
+		iText(235,520,total_cost_str,GLUT_BITMAP_HELVETICA_18);
+		iText(980,520,"TK",GLUT_BITMAP_HELVETICA_18);
 		iSetColor(indigo);
 		iRectangle(225,490,800,65);
 		iRectangle(230,495,790,55);
@@ -1060,29 +1054,37 @@ void iMouse(int button, int state, int mx, int my)
 	//Mess_page
 	else if(button == GLUT_LEFT_BUTTON && state == GLUT_UP && Mess_page)
 	{
-		if(mx>=24 && mx<=224 && my>=1120.0/3&&my<=440)
+		if(mx>=25 && mx<=225 && my>=375 && my<=440)
 		{
 			Mess_page = 0;
 			student_info_page = 1;
 		}
-		if(mx>=25 && mx<=225 && my>=300 && my<=370)
+		else if(mx>=25 && mx<=225 && my>=300 && my<=370)
 		{
-			strcpy(freq,Mess_Name);
-			strcat(freq,"_req.txt");
-			fptr2 = fopen(freq,"r");
-			while(fgets(req_content,100,fptr2))
-			{
-				sscanf(req_content,"%s %[^\n]s",
-				requests[reqidx].pass
-				,requests[reqidx].name);
-				requests[reqidx].meal = 0;
-				requests[reqidx].laundry = 0;
-				requests[reqidx].total = 0;
-				//printf("%s\n",requets[reqidx].name);
-				reqidx++;
-			}
-			fclose(fptr2);
+			//strcpy(freq,Mess_Name);
+			//strcat(freq,"_req.txt");
+			//fptr2 = fopen(freq,"r");
+			// int i =0;
+			// while(fgets(req_content,100,fptr2))
+			// {
+			// 	sscanf(req_content,"%s %[^\n]s",
+			// 	requests[i].pass
+			// 	,requests[i].name);
+			// 	requests[i].meal = 0;
+			// 	requests[i].laundry = 0;
+			// 	requests[i].total = 0;
+			// 	//printf("%s\n",requets[reqidx].name);
+			// 	i++;
+			// }
+			// reqidx =i;
+			//fclose(fptr2);
 			req_page = 1;
+			Mess_page = 0;
+		}
+		else if(mx>=25 && mx<=125 && my>= 200
+		&& my<= 265)
+		{
+			req_log_page = 1;
 			Mess_page = 0;
 		}
 	}
@@ -1134,7 +1136,9 @@ void iMouse(int button, int state, int mx, int my)
 			for(int i=0;i<reqidx;i++)
 			{
 				if(mx>=30 && mx<=480
-				&& my>=700-i*40+dy &&my<= 740-i*40+dy)
+				&& my>=700-i*40+dy &&my<= 740-i*40+dy
+				&& button == GLUT_LEFT_BUTTON && 
+				state == GLUT_UP)
 				{selectidx = i;break;}
 			}
 		}
@@ -1171,7 +1175,7 @@ void iMouse(int button, int state, int mx, int my)
 	}
 	//Req_log_page();
 	else if(button == GLUT_LEFT_BUTTON &&
-	 state == GLUT_UP && req_log_page)
+	state == GLUT_UP && req_log_page)
 	{
 		if(draw_mem)
 		{
@@ -1323,6 +1327,7 @@ void iMouse(int button, int state, int mx, int my)
 				if(strcmp(manager_pass,check_pass)==0)
 				{
 					req_log_page=0;
+					entering_mess();
 					Mess_page = 1;
 				}
 				else
