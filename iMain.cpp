@@ -88,13 +88,10 @@ int mealcost1,laundrycost1,totalcost1;
 int change_pass = 0;
 int stpasslen;
 int change = 0;
-
-
-char tcoststr[100] = "123",lcoststr[100],tmcost[100];
 int Student_page = 0;
 int meal_order = 0,laundry_order = 0;
-char meal_num[100] ="0" ,laundry_num[100] = "0";
-char student_name[100]="Aritro";
+
+
 char meal_cost_str[100],laundry_cost_str[100];
 //char total_cost_str[100];
 int draw_mem = 0,draw_man =0;
@@ -102,13 +99,15 @@ int draw_mem = 0,draw_man =0;
 //for student_info_page
 
 int student_info_page = 0;
-int students_num = 1;
+
 student Students[500];
-char *info_page[5] ={"Name","Meal order",
-"Laundry order","Total cost","Password"};
+char *info_page[5] ={"No","Name","Meal",
+"Laundry","Total(Tk)"};
 int wrName = 0,wrPass = 0,wridx ;
 int Nameidx = 0,Passidx =0;
 char each_name[100],each_pass[100];
+char num_index[100],each_mlt[100];
+int current_stidx =-1;
 
 
 void student_update(char * filename)
@@ -641,45 +640,94 @@ void iDraw()
 	}
 	else if (student_info_page)
 	{
-		iSetColor(black);
-		iRectangle(50,700,100,60);
-		iText(60,720,"Add",GLUT_BITMAP_TIMES_ROMAN_24);
-		for(int i=0;i<5;i++)
+		iSetColor(indigo);
+		
+		for(int i =0;i<5;i++)
 		{
-			iRectangle(150+i*200,700,200,60);
-			iText(160+i*200,710,
-			info_page[i],GLUT_BITMAP_TIMES_ROMAN_24);
-		}
-		for(int i=0;i<students_num;i++)
-		{
-			for(int j=0;j<5;j++)
+			if(i==0)
 			{
-				if(j==0)
-				{
-				iText(150+j*200,700-60*i,
-				Students[i].name,
+				iSetColor(indigo);
+				iRectangle(20,700
+				,50,50);
+				//iSetColor(yellow);
+				iText(30,710,info_page[i],
 				GLUT_BITMAP_TIMES_ROMAN_24);
-				}
-				else if(j==4)
-				{
-				iText(150+j*200,700-60*i,
-				Students[i].pass,
+			}
+			else if(i==1)
+			{
+				iSetColor(indigo);
+				iRectangle(70,700
+				,250,50);
+				//iSetColor(yellow);
+				iText(80,710,info_page[i],
 				GLUT_BITMAP_TIMES_ROMAN_24);
+			}
+			else
+			{
+				iSetColor(indigo);
+				iRectangle(320+(i-2)*120,700
+				,120,50);
+				//iSetColor(yellow);
+				iText(330+(i-2)*120,710,info_page[i],
+				GLUT_BITMAP_TIMES_ROMAN_24);
+			}
+			
+		}
+		for(int j=0;j<totalStudents;j++)
+		{
+			for(int i =0;i<5;i++)
+			{
+				if(i==0)
+				{
+					iSetColor(indigo);
+					iRectangle(20,650-50*j
+					,50,50);
+				//iSetColor(yellow);
+					sprintf(num_index,"%d",j+1);
+					iText(30,660-50*j,num_index,
+					GLUT_BITMAP_TIMES_ROMAN_24);
 				}
-				iRectangle(150+j*200,700-60*i,200,60);
+				else if(i==1)
+				{
+					iSetColor(indigo);
+					iRectangle(70,650-50*j
+					,250,50);
+					//iSetColor(yellow);
+					iText(80,660-50*j,Students[j].name,
+					GLUT_BITMAP_TIMES_ROMAN_24);
+				}
+				else
+				{
+					iSetColor(indigo);
+					iRectangle(320+(i-2)*120,650-50*j
+					,120,50);
+					//iSetColor(yellow);
+					if(i==2){sprintf(each_mlt,"%d",
+					Students[j].meal);}
+					if(i==3){sprintf(each_mlt,"%d",
+					Students[j].laundry);}
+					if(i==4){sprintf(each_mlt,"%d",
+					Students[j].total);}
+					iText(330+(i-2)*120,660-50*j,each_mlt,
+					GLUT_BITMAP_TIMES_ROMAN_24);
+				}
+			
 			}
 		}
-		if(wrName)
+		//for remove option
+		iSetColor(indigo);
+		iFilledRectangle(900,700,100,40);
+		iSetColor(yellow);
+		iText(910,710,"Remove",GLUT_BITMAP_TIMES_ROMAN_24);
+		//back option
+		iSetColor(indigo);
+		iFilledRectangle(700,700,100,40);
+		iSetColor(yellow);
+		iText(710,710,"Back",GLUT_BITMAP_TIMES_ROMAN_24);
+		if(current_stidx!=-1)
 		{
-			iText(160,710-60*wridx,each_name,
-			GLUT_BITMAP_TIMES_ROMAN_24);
-			iRectangle(155,705-60*wridx,190,50);
-		}
-		if(wrPass)
-		{
-			iText(960,710-60*wridx,each_pass,
-			GLUT_BITMAP_TIMES_ROMAN_24);
-			iRectangle(955,705-60*wridx,190,50);
+			iSetColor(indigo);
+			iRectangle(25,655-50*current_stidx,40,40);
 		}
 	}
 	else if(req_log_page)
@@ -1061,23 +1109,7 @@ void iMouse(int button, int state, int mx, int my)
 		}
 		else if(mx>=25 && mx<=225 && my>=300 && my<=370)
 		{
-			//strcpy(freq,Mess_Name);
-			//strcat(freq,"_req.txt");
-			//fptr2 = fopen(freq,"r");
-			// int i =0;
-			// while(fgets(req_content,100,fptr2))
-			// {
-			// 	sscanf(req_content,"%s %[^\n]s",
-			// 	requests[i].pass
-			// 	,requests[i].name);
-			// 	requests[i].meal = 0;
-			// 	requests[i].laundry = 0;
-			// 	requests[i].total = 0;
-			// 	//printf("%s\n",requets[reqidx].name);
-			// 	i++;
-			// }
-			// reqidx =i;
-			//fclose(fptr2);
+			
 			req_page = 1;
 			Mess_page = 0;
 		}
@@ -1148,28 +1180,57 @@ void iMouse(int button, int state, int mx, int my)
 	else if(button == GLUT_LEFT_BUTTON && 
 	state == GLUT_DOWN && student_info_page)
 	{
-		if(mx>=50&& mx<=150 &&
-		my>=700 && my<=760)//Add
-		{
+		// if(mx>=50&& mx<=150 &&
+		// my>=700 && my<=760)//Add
+		// {
 			
-			students_num+=1;
-			//Students[students_num-1] ={"Aritro","123",0,0,0};
-		}
-		for(int i=1;i<students_num;i++)
+		// 	students_num+=1;
+		// 	//Students[students_num-1] ={"Aritro","123",0,0,0};
+		// }
+		// for(int i=1;i<students_num;i++)
+		// {
+		// 	if(mx>=150&& mx<=350 && my>=700-60*i
+		// 	&& my<=760 -60*i)
+		// 	{
+		// 		wridx = i;
+		// 		wrName =1;
+		// 		wrPass = 0;
+		// 	}
+		// 	else if(mx>=950&& mx<=1150
+		// 	&& my>= 700 -60*i && my<= 760 -60*i)
+		// 	{
+		// 		wridx = i;
+		// 		wrName =0;
+		// 		wrPass = 1;
+		// 	}
+		// }
+		if(mx>=700 &&mx<=800 &&
+		my>= 700 && my<=740)//back button
 		{
-			if(mx>=150&& mx<=350 && my>=700-60*i
-			&& my<=760 -60*i)
+			current_idx = -1;
+			entering_mess();
+			Mess_page =1;
+			student_info_page = 0;
+		}
+		else if(mx>=900 && mx<=1000 &&
+		my>=700 && my<=740)//remove option
+		{
+			if(current_stidx!=-1)
 			{
-				wridx = i;
-				wrName =1;
-				wrPass = 0;
+				strcpy(fname,Mess_Name);
+				strcat(fname,".txt");
+				delete_line(current_stidx+1,fname);
+				entering_mess();
+				current_stidx =-1;
 			}
-			else if(mx>=950&& mx<=1150
-			&& my>= 700 -60*i && my<= 760 -60*i)
+		}
+		else{
+			for(int i=0;i<totalStudents;i++)
 			{
-				wridx = i;
-				wrName =0;
-				wrPass = 1;
+				if(mx>=20 && mx<=570
+				&& my>=650-i*50 &&my<= 700-i*50
+				)
+				{current_stidx = i;break;}
 			}
 		}
 	}
@@ -1329,6 +1390,8 @@ void iMouse(int button, int state, int mx, int my)
 					req_log_page=0;
 					entering_mess();
 					Mess_page = 1;
+					spass_index = 0;
+					manager_pass[spass_index] = '\0';
 				}
 				else
 				{
@@ -1350,6 +1413,7 @@ void iMouse(int button, int state, int mx, int my)
 			}
 		}
 	}
+	//Students page
 	else if(Student_page && state == GLUT_DOWN
 	&& button == GLUT_LEFT_BUTTON)
 	{

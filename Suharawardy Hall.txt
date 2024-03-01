@@ -1,11 +1,10 @@
 Manager_pass:Aritro123
 Joy_bangla 2 1 85 Nefaur Nibir
 123 5 1 190 Libir boy
-123 6 2 240 Hello boyyyyyyyyy
 JoyBangla_1234 2 3 115 Aritro Biswas
 1234Sir 6 8 330 Aritro Shankar Biswas
 Atrain 9 7 420 Ashok gupta
 123123 4 8 260 Oyshik roy
 123 4 7 245 Faysal ahmed
 123 14 2 520 nil akash
-bob_build 0 0 0 bob the builder
+whatthe 0 0 0 ASBK roy
