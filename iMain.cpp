@@ -194,6 +194,19 @@ void entering_mess()
 	fclose(f1);
 }
 
+void create_mess()
+{
+	strcpy(fname,Mess_Name);
+	strcpy(freq,Mess_Name);
+	strcat(fname,".txt");
+	strcat(freq,"_req.txt");
+	FILE *f = fopen(fname,"w");
+	FILE *f1 = fopen(freq,"w");
+	fprintf(f,"Manager_pass:%s\n",Mess_pass);
+	fclose(f1);
+	fclose(f);
+}
+
 void delete_line(int index,char *filename)
 {
     char tempfile[100]="temp__",buffer[100];
@@ -978,19 +991,16 @@ void iMouse(int button, int state, int mx, int my)
 				fptr = fopen(fname,"r");
 				if(fptr == NULL)//no existing mess
 				{
-					Mess_page = 1;
-					Create_page = 0;
-					fptr = fopen(fname,"w");
-					fprintf(fptr,"%s:%s\n",
-					"Manager_pass",Mess_pass);
-					strcat(freq,Mess_Name);
-					strcat(freq,"_req");
-					strcat(freq,".txt");
-					fptr = fopen(freq,"w");
 					fclose(fptr);
+					
+					create_mess();
+					Create_page = 0;
+					Mess_page = 1;
+					entering_mess();
 				}
 				else//exits mess of the name
 				{
+				fclose(fptr);
 				wrInvalidUser = 1;
 				wrMessname =0,wrMessPass=0;
 				Mess_name_index = 0;
@@ -1019,7 +1029,7 @@ void iMouse(int button, int state, int mx, int my)
 			Mess_pass_index = 0;
 			Mess_Name[Mess_name_index] = '\0';
 			Mess_pass[Mess_pass_index] = '\0';
-			home_page =1;
+			home_page = 1;
 			Mess_page = 0;
 		}
 		else
@@ -1128,9 +1138,12 @@ void iMouse(int button, int state, int mx, int my)
 			Mess_page = 0;
 		}
 		else if(mx>=25 && mx<=125 && my>= 200
-		&& my<= 265)
+		&& my<= 265)//back button
 		{
-			req_log_page = 1;
+			home_page = 1;
+			Mess_name_index = 0;
+			draw_man = 0;
+			Mess_Name[Mess_name_index] = '\0';
 			Mess_page = 0;
 		}
 	}
