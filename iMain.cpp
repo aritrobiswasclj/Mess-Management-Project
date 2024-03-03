@@ -289,7 +289,7 @@ void iDraw()
 {
 	// place your drawing codes here
 	iClear();
-	iSetColor(antique_white);
+	iSetColor(white);
 	iFilledRectangle(0, 0, 1920, 1080);
 	if (home_page)
 	{
