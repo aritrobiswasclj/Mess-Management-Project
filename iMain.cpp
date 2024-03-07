@@ -23,7 +23,7 @@ using namespace std;
 	function iDraw() is called again and again by the system.
 
 */
-
+int scrolling_start=0;
 typedef struct student
 {
 	char name[200],pass[200];
@@ -806,7 +806,8 @@ void iDraw()
 	else if (student_info_page)
 	{
 		iSetColor(indigo);
-		
+		iShowBMP(1000,500,"pic//create_pagebg4.bmp");
+		iShowBMP(900,300,"pic//create_pagebg4.bmp");
 		for(int i =0;i<5;i++)
 		{
 			if(i==0)
@@ -1078,6 +1079,8 @@ void iDraw()
 	if(req_page)
 	{
 		iSetColor(indigo);
+		iShowBMP(900,500,"pic//create_pagebg4.bmp");
+		iShowBMP(900,300,"pic//create_pagebg4.bmp");
 		for(int i=0;i<reqidx;i++)
 		{
 			iSetColor(indigo);
