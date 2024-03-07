@@ -1,4 +1,0 @@
-Manager_pass:12345
-Aritro122 5 4 235 Salman Khan
-12345 0 0 0 Fahim Ahmed
-1244 0 0 0 Dev Da

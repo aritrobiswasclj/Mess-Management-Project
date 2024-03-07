@@ -1,1 +1,0 @@
-Manager_pass:12345
