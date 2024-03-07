@@ -1133,13 +1133,13 @@ void iMouseMove(int mx, int my)
 	{
 		dy = (my-endy);
 		y = y+dy;
-		endy =y;
+		endy =y-40*reqidx;
 	}
 	else if(student_info_page)
 	{
 		dy = (my-endy);
 		y = y+dy;
-		endy =y;
+		endy =y-totalStudents*50;
 	}
 	// place your codes here
 }
@@ -1617,7 +1617,7 @@ void iMouse(int button, int state, int mx, int my)
 					sscanf(req_content,
 					"%s %[^\n]s",
 					check_pass,check_name);
-					printf("%s: %s\n",check_name,check_pass);
+					//printf("%s: %s\n",check_name,check_pass);
 					if(strcmp(check_name,s1.name)==0
 					&& strcmp(check_pass,s1.pass)==0)
 					{check = 1;fclose(fptr2);
