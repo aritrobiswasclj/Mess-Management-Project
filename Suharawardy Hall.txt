@@ -1,4 +1,4 @@
-Manager_pass:Aritro
+Manager_pass:ARITRO
 Joy_bangla 2 1 85 Nefaur Nibir
 1234 3 4 165 Aritro Shankar Biswas
 123 0 0 0 Fayasal ahmed

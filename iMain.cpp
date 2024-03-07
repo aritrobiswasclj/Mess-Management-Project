@@ -194,7 +194,7 @@ void entering_mess()
 		Students[i].total = atoi(total);
 		total_+= Students[i].total;
 		meals_ += Students[i].meal;
-		laundrys_ += Students[i].total;
+		laundrys_ += Students[i].laundry;
 		//cout<<Students[i].name<<" "<<Students[i].pass<<" "
 		//<<Students[i].meal<<" "<<Students[i].laundry<<endl;
 		i++;
@@ -1372,6 +1372,7 @@ void iMouse(int button, int state, int mx, int my)
 			Mess_page = 0;
 			Mess_pass_index = 0;
 			Mess_pass[0] = '\0';
+			dup_create_pass[0] = '\0';
 			change_mess_pass = 0;
 			write_mess_pass = 0;
 		}
