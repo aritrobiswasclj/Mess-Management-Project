@@ -1,5 +1,9 @@
 Manager_pass:Aritro
 Joy_bangla 2 1 85 Nefaur Nibir
-JoyBangla_1234 2 3 115 Aritro Biswas
 1234 3 5 180 Aritro Shankar Biswas
-123123 4 8 260 Oyshik roy
+123 0 0 0 Fayasal ahmed
+123 0 0 0 Sheikh Sajid
+123 0 0 0 Fahim Ahmed
+123 0 0 0 Hadi
+123 0 0 0 Rafid
+abcd 0 0 0 Mahadi Omi

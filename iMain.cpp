@@ -812,28 +812,28 @@ void iDraw()
 			if(i==0)
 			{
 				iSetColor(indigo);
-				iRectangle(20,700
+				iRectangle(20,y
 				,50,50);
 				//iSetColor(yellow);
-				iText(30,710,info_page[i],
+				iText(30,y+10,info_page[i],
 				GLUT_BITMAP_TIMES_ROMAN_24);
 			}
 			else if(i==1)
 			{
 				iSetColor(indigo);
-				iRectangle(70,700
+				iRectangle(70,y
 				,250,50);
 				//iSetColor(yellow);
-				iText(80,710,info_page[i],
+				iText(80,y+10,info_page[i],
 				GLUT_BITMAP_TIMES_ROMAN_24);
 			}
 			else
 			{
 				iSetColor(indigo);
-				iRectangle(320+(i-2)*120,700
+				iRectangle(320+(i-2)*120,y
 				,120,50);
 				//iSetColor(yellow);
-				iText(330+(i-2)*120,710,info_page[i],
+				iText(330+(i-2)*120,y+10,info_page[i],
 				GLUT_BITMAP_TIMES_ROMAN_24);
 			}
 			
@@ -845,26 +845,26 @@ void iDraw()
 				if(i==0)
 				{
 					iSetColor(indigo);
-					iRectangle(20,650-50*j
+					iRectangle(20,y-50-50*j
 					,50,50);
 				//iSetColor(yellow);
 					sprintf(num_index,"%d",j+1);
-					iText(30,660-50*j,num_index,
+					iText(30,y-40-50*j,num_index,
 					GLUT_BITMAP_TIMES_ROMAN_24);
 				}
 				else if(i==1)
 				{
 					iSetColor(indigo);
-					iRectangle(70,650-50*j
+					iRectangle(70,y-50-50*j
 					,250,50);
 					//iSetColor(yellow);
-					iText(80,660-50*j,Students[j].name,
+					iText(80,y-40-50*j,Students[j].name,
 					GLUT_BITMAP_TIMES_ROMAN_24);
 				}
 				else
 				{
 					iSetColor(indigo);
-					iRectangle(320+(i-2)*120,650-50*j
+					iRectangle(320+(i-2)*120,y-50-50*j
 					,120,50);
 					//iSetColor(yellow);
 					if(i==2){sprintf(each_mlt,"%d",
@@ -873,7 +873,7 @@ void iDraw()
 					Students[j].laundry);}
 					if(i==4){sprintf(each_mlt,"%d",
 					Students[j].total);}
-					iText(330+(i-2)*120,660-50*j,each_mlt,
+					iText(330+(i-2)*120,y-40-50*j,each_mlt,
 					GLUT_BITMAP_TIMES_ROMAN_24);
 				}
 			
@@ -896,7 +896,7 @@ void iDraw()
 		if(current_stidx!=-1)
 		{
 			iSetColor(indigo);
-			iRectangle(25,655-50*current_stidx,40,40);
+			iRectangle(25,y-50+5-50*current_stidx,40,40);
 		}
 	}
 	else if(req_log_page)
@@ -1115,7 +1115,7 @@ void iDraw()
 		if(selectidx != -1)
 		{
 			iSetColor(indigo);
-			iRectangle(35,705-selectidx*40+dy,90,30);
+			iRectangle(35,y+5-selectidx*40+dy,90,30);
 		}
 	}
 
@@ -1129,12 +1129,18 @@ void iDraw()
 void iMouseMove(int mx, int my)
 {
 
-	/* if(req_page)
+	if(req_page)
 	{
 		dy = (my-endy);
 		y = y+dy;
 		endy =y;
-	}  */
+	}
+	else if(student_info_page)
+	{
+		dy = (my-endy);
+		y = y+dy;
+		endy =y;
+	}
 	// place your codes here
 }
 
@@ -1401,6 +1407,8 @@ void iMouse(int button, int state, int mx, int my)
 			Mess_page =1;req_page = 0;
 			reqidx = 0;
 			selectidx = -1;
+			y = 700;
+			endy =740;
 			entering_mess();
 		}
 		else if(mx>=700 &&mx<=800 && my>=700 && my<=740
@@ -1443,7 +1451,7 @@ void iMouse(int button, int state, int mx, int my)
 			for(int i=0;i<reqidx;i++)
 			{
 				if(mx>=30 && mx<=480
-				&& my>=700-i*40+dy &&my<= 740-i*40+dy
+				&& my>=y-i*40+dy &&my<= y+40-i*40+dy
 				&& button == GLUT_LEFT_BUTTON && 
 				state == GLUT_UP)
 				{selectidx = i;;break;}
@@ -1465,6 +1473,7 @@ void iMouse(int button, int state, int mx, int my)
 			entering_mess();
 			Mess_page =1;
 			student_info_page = 0;
+			y=700 ,endy =740;
 		}
 		else if(mx>=900 && mx<=1000 &&
 		my>=700 && my<=740)//remove option
@@ -1483,7 +1492,7 @@ void iMouse(int button, int state, int mx, int my)
 			for(int i=0;i<totalStudents;i++)
 			{
 				if(mx>=20 && mx<=680
-				&& my>=650-i*50 &&my<= 700-i*50
+				&& my>=y-50-i*50 &&my<= y-i*50
 				)
 				{current_stidx = i;
 				temp_clk = 1;break;}
